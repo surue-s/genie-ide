@@ -1,0 +1,71 @@
+GENIE IDE – Project1 Comprehensive Document 
+
+Project Overview 
+GENIE IDE (Guided Environment for Novice & Intelligent Engineering) is a large-scale, 
+research-grade, beginner-friendly Intelligent Development Environment designed to help 
+novice programmers learn, write, understand, and debug code with guided, AI-assisted 
+support. The core philosophy is learning-first, clarity-driven development rather than 
+productivity-at-all-costs. 
+
+Problem Statement 
+Beginner programmers struggle with steep learning curves, cryptic compiler errors, lack of 
+conceptual understanding, and overwhelming professional IDEs. Existing tools prioritize 
+experienced developers and assume prior knowledge, leaving novices confused, dependent 
+on external resources, and prone to frustration or dropout. 
+
+Objectives 
+- Provide a beginner-first IDE experience 
+- Translate compiler/runtime errors into human-understandable explanations 
+- Guide users step-by-step while coding 
+- Encourage conceptual understanding over copy-paste learning 
+- Act as both an IDE and an interactive tutor 
+
+Target Users 
+- Absolute beginners in programming 
+- Students in schools, colleges, and universities 
+- Self-learners transitioning into software development 
+- Neurodivergent learners who need structured, adaptive guidance 
+
+Core Features 
+- Intelligent error detection and explanation 
+- Step-by-step guided coding mode 
+- Concept-first explanations before fixes 
+- Beginner-safe execution environment 
+- Progressive difficulty scaling 
+- Inline learning prompts and hints 
+
+AI Capabilities 
+- Code intent understanding 
+- Error cause analysis 
+- Natural language explanations 
+- Adaptive guidance based on user skill level 
+- Prevention of blind auto-fixing to promote learning 
+
+Design Philosophy 
+GENIE IDE avoids overwhelming interfaces. UI elements are minimal, contextual, and 
+progressive. Features unlock as the learner grows. The system prioritizes transparency, 
+predictability, and educational value over speed or shortcuts. 
+
+Architecture Overview 
+- Modular architecture 
+- Language-agnostic core with language-specific adapters 
+- Local-first execution with optional cloud assistance 
+- Secure sandboxed runtime 
+- Plugin-ready extensible system 
+
+Educational Approach 
+- Explain-before-fix rule 
+- Error tracing instead of error hiding 
+- Encourages experimentation in a safe environment 
+- Reinforces fundamentals such as logic flow, syntax, and program structure 
+
+Future Scope 
+- Multi-language support expansion 
+- Visual execution tracing 
+- Curriculum-aligned learning paths 
+- Classroom and instructor dashboards 
+- Research integration for learning analytics 
+
+Project Status 
+GENIE IDE is an evolving long-term project positioned as a foundational learning tool rather 
+than a commercial IDE clone. The focus remains on correctness, pedagogy, and scalability.

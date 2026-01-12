@@ -1,0 +1,33 @@
+{
+  "name": "genie-ide",
+  "version": "1.0.0",
+  "description": "Beginner-first intelligent IDE",
+  "main": "electron/index.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "vite",
+    "dev:electron": "cross-env NODE_ENV=development electron .",
+    "dev:react": "vite --port 5173",
+    "build": "vite build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "electron",
+    "ide",
+    "educational"
+  ],
+  "author": "surue",
+  "license": "MIT",
+  "devDependencies": {
+    "@vitejs/plugin-react": "^5.1.2",
+    "cross-env": "^7.0.3",
+    "electron": "^39.2.7",
+    "vite": "^7.3.1"
+  },
+  "dependencies": {
+    "@monaco-editor/react": "^4.7.0",
+    "monaco-editor": "^0.55.1",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3"
+  }
+}
