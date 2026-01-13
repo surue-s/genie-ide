@@ -6,7 +6,7 @@
   "scripts": {
     "start": "electron .",
     "dev": "vite",
-    "dev:electron": "cross-env NODE_ENV=development electron .",
+    "dev:electron": "cross-env NODE_ENV=development electron --disable-features=AutofillCreditCardEnabled,AutofillAddressEnabled .",
     "dev:react": "vite --port 5173",
     "build": "vite build",
     "test": "echo \"Error: no test specified\" && exit 1"

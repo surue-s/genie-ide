@@ -7,14 +7,14 @@ function createWindow() {
         height: 700,
         webPreferences: {
             preload: path.join(__dirname, "preload.js"),
-            nodeIntegration:  true,
-            contextIsolation: false,
-            webSecurity: false, // Needed for Monaco workers
+            nodeIntegration: false,  // Disable node integration for security
+            contextIsolation: true,  // Enable context isolation for security
+            sandbox: false,
         },
     });
-    
     win.loadURL('http://localhost:5173');
     win.webContents.openDevTools();
+
 }
 
 app.whenReady().then(createWindow);
