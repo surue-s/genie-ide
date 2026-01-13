@@ -1,3 +1,4 @@
+
 const { app, BrowserWindow } = require("electron");
 const path = require("path");
 
@@ -11,8 +12,9 @@ function createWindow() {
             contextIsolation: false
         },
     });
-
     win.loadURL('http://localhost:5173');
+    win.webContents.openDevTools();
+
 }
 
 app.whenReady().then(createWindow);
@@ -23,6 +25,3 @@ app.on("window-all-closed", () => {
     }
 });
 
-
-// Commits on git test
-//monacoooo

@@ -1,8 +1,11 @@
-import CodeEditor from "./editor/CodeEditor"
-export default function App(){
+import CodeEditor from "./editor/CodeEditor";
 
-    const handleCodeChange = (code) => {
-        console.log("Current code:", code);
-    };
-    return<CodeEditor onChange = {handleCodeChange}/>;
+function App() {
+  return (
+    <div style={{ height: "100vh" }}>
+      <CodeEditor onChange={() => {}} />
+    </div>
+  );
 }
+
+export default App;
