@@ -1,4 +1,3 @@
-
 const { app, BrowserWindow } = require("electron");
 const path = require("path");
 
@@ -8,13 +7,14 @@ function createWindow() {
         height: 700,
         webPreferences: {
             preload: path.join(__dirname, "preload.js"),
-            nodeIntegration: true,
-            contextIsolation: false
+            nodeIntegration:  true,
+            contextIsolation: false,
+            webSecurity: false, // Needed for Monaco workers
         },
     });
+    
     win.loadURL('http://localhost:5173');
     win.webContents.openDevTools();
-
 }
 
 app.whenReady().then(createWindow);
@@ -24,4 +24,3 @@ app.on("window-all-closed", () => {
         app.quit();
     }
 });
-
