@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 
-export default function TreeView({ document }) {
+export default function TreeView({ document, ast }) {
   const [expandedNodes, setExpandedNodes] = useState(new Set());
 
-  if (!document || !document.ast || !document.ast.rootNode) {
+  if (!document || !ast) {
     return (
       <div style={{ 
         backgroundColor: '#1e1e1e', 
@@ -14,7 +14,7 @@ export default function TreeView({ document }) {
         alignItems: 'center',
         justifyContent: 'center'
       }}>
-        No AST available - waiting for document to parse...
+        {!ast ? 'AST not available - parsing may have failed' : 'No document selected'}
       </div>
     );
   }
@@ -75,7 +75,7 @@ export default function TreeView({ document }) {
       fontFamily: 'monospace'
     }}>
       <h3 style={{ margin: '0 0 10px 0', color: '#9cdcfe' }}>Abstract Syntax Tree (AST)</h3>
-      {document.ast.rootNode && renderTreeNode(document.ast.rootNode)}
+      {ast.rootNode && renderTreeNode(ast.rootNode)}
     </div>
   );
 }

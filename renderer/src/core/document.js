@@ -40,26 +40,33 @@ export async function initTreeSitter() {
 }
 
 export async function createDocument(initialCode = "", title = "") {
-  const doc = {
+  // Create document synchronously without any parsing
+  return {
     id: crypto.randomUUID(),
     language: "javascript",
     text: initialCode, 
     title: title || `untitled-${crypto.randomUUID().substring(0, 4)}.js`,
     version: 1,
     updatedAt: Date.now(),
-    ast: null,
-    parser: null
+    ast: null, // AST will be computed separately
   };
+}
 
-  // Try to parse the document immediately
-  try {
-    await parseDocument(doc);
-  } catch (error) {
-    console.warn("Could not parse document initially:", error);
-    // Still return the document even if parsing failed
-  }
-  
-  return doc;
+export function updateDocument(doc, newText) {
+  // Update document synchronously without parsing
+  return {
+    ...doc,
+    text: newText,
+    version: doc.version + 1,
+    updatedAt: Date.now()
+  };
+}
+
+export function changeLanguage(doc, newLanguage) {
+  return {
+    ...doc,
+    language: newLanguage
+  };
 }
 
 export async function parseDocument(doc) {
@@ -76,31 +83,4 @@ export async function parseDocument(doc) {
   
   doc.ast = parserInstance.parse(doc.text);
   return doc;
-}
-
-export async function updateDocument(doc, newText) {
-  const updatedDoc = {
-    ...doc,
-    text: newText,
-    version: doc.version + 1,
-    updatedAt: Date.now()
-  };
-  
-  // Re-parse the document with the new text
-  try {
-    await parseDocument(updatedDoc);
-  } catch (error) {
-    console.warn("Could not re-parse document:", error);
-    // Still return the document with updated text even if parsing failed
-    return updatedDoc;
-  }
-  
-  return updatedDoc;
-}
-
-export function changeLanguage(doc, newLanguage) {
-  return {
-    ...doc,
-    language: newLanguage
-  };
 }

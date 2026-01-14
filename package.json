@@ -4,7 +4,7 @@
   "description": "Beginner-first intelligent IDE",
   "main": "electron/index.js",
   "scripts": {
-    "start": "electron .",
+    "start": "electron . --disable-features=AutofillCreditCardEnabled,AutofillAddressEnabled",
     "dev": "vite",
     "dev:electron": "cross-env NODE_ENV=development electron --disable-features=AutofillCreditCardEnabled,AutofillAddressEnabled .",
     "dev:react": "vite --port -",

@@ -2,65 +2,77 @@ import { useState, useEffect } from 'react';
 import CodeEditor from "./editor/CodeEditor";
 import Tabs from "./editor/Tabs";
 import TreeView from "./editor/TreeView";
-import { createDocument, updateDocument, initTreeSitter } from "./core/document";
+import { createDocument, updateDocument } from "./core/document";
+import { initTreeSitter } from "./engine/treesitter/init";
+import { parseDocument } from "./engine/treesitter/parse";
 
 export default function App() {
-  // Initialize with one document
+  // Initialize with one document synchronously
   const [documents, setDocuments] = useState([]);
   const [currentDocumentId, setCurrentDocumentId] = useState(null);
   const [activePanel, setActivePanel] = useState('info'); // 'info', 'ast'
   const [isLoading, setIsLoading] = useState(true);
   const [initError, setInitError] = useState(null);
+  const [parsedAst, setParsedAst] = useState(null);
 
-  // Initialize the first document and Tree-sitter
+  // Initialize the first document synchronously and Tree-sitter separately
   useEffect(() => {
-    const initializeApp = async () => {
+    // Create initial document synchronously
+    const initialDoc = createDocument("// Welcome to Genie IDE\n// Start coding here...");
+    initialDoc.title = "welcome.js"; // Add a title property
+    
+    setDocuments([initialDoc]);
+    setCurrentDocumentId(initialDoc.id);
+    
+    // Initialize Tree-sitter separately, after UI renders
+    const initializeTreeSitterAsync = async () => {
       try {
-        // Initialize Tree-sitter
         await initTreeSitter();
-        
-        // Create initial document
-        const initialDoc = await createDocument("// Welcome to Genie IDE\n// Start coding here...");
-        initialDoc.title = "welcome.js"; // Add a title property
-        
-        setDocuments([initialDoc]);
-        setCurrentDocumentId(initialDoc.id);
         setIsLoading(false);
       } catch (error) {
-        console.error("Error initializing app:", error);
+        console.error("Error initializing Tree-sitter:", error);
         setInitError(error.message);
         setIsLoading(false);
       }
     };
-
-    initializeApp();
+    
+    initializeTreeSitterAsync();
   }, []);
+
+  // Update AST when current document changes
+  useEffect(() => {
+    if (currentDocumentId) {
+      const doc = documents.find(d => d.id === currentDocumentId);
+      if (doc) {
+        // Parse the document separately from UI updates
+        const ast = parseDocument(doc);
+        setParsedAst(ast);
+      }
+    }
+  }, [currentDocumentId, documents]);
 
   const currentDocument = documents.find(doc => doc.id === currentDocumentId);
 
-  const handleCodeChange = async (code) => {
+  const handleCodeChange = (code) => {
     if (currentDocument) {
-      try {
-        const updatedDoc = await updateDocument(currentDocument, code);
-        
-        setDocuments(docs => 
-          docs.map(doc => doc.id === currentDocumentId ? updatedDoc : doc)
-        );
-      } catch (error) {
-        console.error("Error updating document:", error);
-      }
+      // Update document synchronously without blocking UI
+      const updatedDoc = updateDocument(currentDocument, code);
+      
+      setDocuments(docs => 
+        docs.map(doc => doc.id === currentDocumentId ? updatedDoc : doc)
+      );
+      
+      // Parse the updated document separately
+      const ast = parseDocument(updatedDoc);
+      setParsedAst(ast);
     }
   };
 
   const handleNewFile = async () => {
-    try {
-      const newDoc = await createDocument("// New file\n// Start coding here...");
-      newDoc.title = `untitled-${newDoc.id.substring(0, 4)}.js`;
-      setDocuments(docs => [...docs, newDoc]);
-      setCurrentDocumentId(newDoc.id);
-    } catch (error) {
-      console.error("Error creating new file:", error);
-    }
+    const newDoc = createDocument("// New file\n// Start coding here...");
+    newDoc.title = `untitled-${newDoc.id.substring(0, 4)}.js`;
+    setDocuments(docs => [...docs, newDoc]);
+    setCurrentDocumentId(newDoc.id);
   };
 
   const handleCloseTab = (docId) => {
@@ -68,15 +80,10 @@ export default function App() {
     
     if (remainingDocs.length === 0) {
       // If we're closing the last document, create a new one
-      createDocument("// Welcome to Genie IDE\n// Start coding here...")
-        .then(newDoc => {
-          newDoc.title = "welcome.js";
-          setDocuments([newDoc]);
-          setCurrentDocumentId(newDoc.id);
-        })
-        .catch(error => {
-          console.error("Error creating fallback document:", error);
-        });
+      const fallbackDoc = createDocument("// Welcome to Genie IDE\n// Start coding here...");
+      fallbackDoc.title = "welcome.js";
+      setDocuments([fallbackDoc]);
+      setCurrentDocumentId(fallbackDoc.id);
     } else {
       setDocuments(remainingDocs);
       
@@ -90,21 +97,6 @@ export default function App() {
   const handleSelectTab = (docId) => {
     setCurrentDocumentId(docId);
   };
-
-  if (isLoading) {
-    return (
-      <div style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100vh",
-        backgroundColor: "#1e1e1e",
-        color: "#ccc"
-      }}>
-        Initializing Genie IDE...
-      </div>
-    );
-  }
 
   if (initError) {
     return (
@@ -122,6 +114,7 @@ export default function App() {
           <h2>Error initializing Genie IDE</h2>
           <p>{initError}</p>
           <p>Please check the console for more details.</p>
+          <p>UI is still functional but AST features may not work.</p>
         </div>
       </div>
     );
@@ -236,14 +229,14 @@ export default function App() {
                     <p>Language: {currentDocument.language}</p>
                     <p>Version: {currentDocument.version}</p>
                     <p>Last Updated: {new Date(currentDocument.updatedAt).toLocaleString()}</p>
-                    <p>AST Ready: {currentDocument.ast ? 'Yes' : 'No'}</p>
+                    <p>AST Ready: {parsedAst ? 'Yes' : 'No'}</p>
                   </>
                 ) : (
                   <p>No document selected</p>
                 )}
               </div>
             ) : (
-              <TreeView document={currentDocument} />
+              <TreeView document={currentDocument} ast={parsedAst} />
             )}
           </div>
         </div>
