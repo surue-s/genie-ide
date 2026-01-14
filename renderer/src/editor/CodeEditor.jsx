@@ -1,29 +1,40 @@
 import Editor from "@monaco-editor/react";
-import {useState, useEffect} from "react";
+import { useRef, useEffect } from "react";
 
 export default function CodeEditor({ document, onChange }) {
-  const[currentValue, setCurrentValue] = useState(document?.text || "");
+  const editorRef = useRef(null);
+  const currentDocumentRef = useRef(document);
 
-    useEffect(() => {
-    if (document && document.text !== currentValue) {
-      setCurrentValue(document.text);
+  useEffect(() => {
+    if (editorRef.current && document && currentDocumentRef.current?.id !== document.id) {
+      editorRef.current.setValue(document.text || "");
+      currentDocumentRef.current = document;
     }
   }, [document]);
 
-
-  const handleChange = (value) =>{
-    setCurrentValue(value);
-    if(onChange){
+  const handleEditorChange = (value) => {
+    if (onChange) {
       onChange(value);
     }
-  }
+  };
 
-      return (
+  const handleEditorDidMount = (editor) => {
+    editorRef.current = editor;
+    
+    // Set initial value
+    if (document && document.text) {
+      editor.setValue(document.text);
+    }
+  };
+
+  return (
     <Editor
       height="100%"
-      defaultLanguage="javascript"
-      onChange={(v) => onChange?.(v ?? "")}
-      theme = "vs-dark"
+      defaultLanguage={document?.language || "javascript"}
+      defaultValue={document?.text || "// Start typing here"}
+      onChange={handleEditorChange}
+      onMount={handleEditorDidMount}
+      theme="vs-dark"
     />
   );
 }
