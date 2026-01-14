@@ -1,12 +1,15 @@
 import Editor from "@monaco-editor/react";
-import { useRef, useEffect } from "react";
+import { useEffect, useRef } from 'react';
+
 
 export default function CodeEditor({ document, onChange }) {
   const editorRef = useRef(null);
   const currentDocumentRef = useRef(document);
 
+  // Update the editor content when document changes
   useEffect(() => {
     if (editorRef.current && document && currentDocumentRef.current?.id !== document.id) {
+      // Only update if it's a different document
       editorRef.current.setValue(document.text || "");
       currentDocumentRef.current = document;
     }

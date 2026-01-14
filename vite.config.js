@@ -8,4 +8,15 @@ export default defineConfig({
     port: 5173,
     strictPort: true,
   },
+  define: {
+    global: "globalThis",
+  },
+  optimizeDeps: {
+    exclude: ["web-tree-sitter"],
+  },
+  build: {
+    commonjsOptions: {
+      transformMixedEsModules: true,
+    },
+  },
 });
