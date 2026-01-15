@@ -1,42 +1,41 @@
 import Editor from "@monaco-editor/react";
-import { useRef, useEffect } from "react";
+import { useRef } from "react";
 
 export default function CodeEditor({ document, onChange }) {
   const editorRef = useRef(null);
-  const currentDocumentRef = useRef(document);
 
-  // Update the editor content when document changes
-  useEffect(() => {
-    if (editorRef.current && document && currentDocumentRef.current?.id !== document.id) {
-      // Only update if it's a different document
-      editorRef.current.setValue(document.text || "");
-      currentDocumentRef.current = document;
-    }
-  }, [document]);
-
-  const handleEditorChange = (value) => {
-    if (onChange) {
-      onChange(value);
-    }
-  };
-
-  const handleEditorDidMount = (editor) => {
-    editorRef.current = editor;
-    
-    // Set initial value
-    if (document && document.text) {
-      editor.setValue(document.text);
-    }
-  };
+  if (!document) {
+    return (
+      <div style={{
+        height: "100%",
+        background: "#1e1e1e",
+        color: "#ccc",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center"
+      }}>
+        No document selected
+      </div>
+    );
+  }
 
   return (
     <Editor
       height="100%"
-      defaultLanguage={document?.language || "javascript"}
-      defaultValue={document?.text || "// Start typing here"}
-      onChange={handleEditorChange}
-      onMount={handleEditorDidMount}
+      language={document.language || "javascript"}
+      value={document.text}
       theme="vs-dark"
+      onMount={(editor) => {
+        editorRef.current = editor;
+      }}
+      onChange={(value) => onChange?.(value ?? "")}
+      options={{
+        automaticLayout: true,
+        minimap: { enabled: true },
+        fontSize: 14,
+        tabSize: 2,
+        scrollBeyondLastLine: false,
+      }}
     />
   );
 }
