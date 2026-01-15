@@ -10,6 +10,7 @@ export function createDocument(initialCode = "", title = "") {
 }
 
 export function updateDocument(doc, newText) {
+  if (!doc) return null;
   return {
     ...doc,
     text: newText,
