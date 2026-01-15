@@ -12,7 +12,7 @@ export default defineConfig({
     global: "globalThis",
   },
   optimizeDeps: {
-    exclude: ["web-tree-sitter"],
+    exclude: [],
   },
   build: {
     commonjsOptions: {

@@ -7,7 +7,6 @@ export default function Tabs({ documents, currentDocumentId, onSelect, onClose }
       backgroundColor: '#1e1e1e',
       borderBottom: '1px solid #222',
       overflowX: 'auto',
-      color: '#ccc',
       height: '35px'
     }}>
       {documents.map((doc) => (

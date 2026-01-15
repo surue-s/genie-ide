@@ -7,7 +7,7 @@
     "start": "electron . --disable-features=AutofillCreditCardEnabled,AutofillAddressEnabled",
     "dev": "vite",
     "dev:electron": "cross-env NODE_ENV=development electron --disable-features=AutofillCreditCardEnabled,AutofillAddressEnabled .",
-    "dev:react": "vite --port -",
+    "dev:react": "vite --port 5173",
     "build": "vite build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -28,8 +28,6 @@
     "@monaco-editor/react": "^4.7.0",
     "monaco-editor": "^0.55.1",
     "react": "^19.2.3",
-    "react-dom": "^19.2.3",
-    "tree-sitter-cli": "^0.26.3",
-    "web-tree-sitter": "^0.26.3"
+    "react-dom": "^19.2.3"
   }
 }

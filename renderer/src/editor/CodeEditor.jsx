@@ -1,6 +1,5 @@
 import Editor from "@monaco-editor/react";
-import { useEffect, useRef } from 'react';
-
+import { useRef, useEffect } from "react";
 
 export default function CodeEditor({ document, onChange }) {
   const editorRef = useRef(null);
