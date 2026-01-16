@@ -3,6 +3,7 @@ import CodeEditor from "./editor/CodeEditor";
 import Tabs from "./editor/Tabs";
 import { createDocument } from "./core/document";
 import { LANGUAGE_VERSIONS } from "./core/constants";
+import Output from "./editor/Output";
 
 export default function App() {
   const initialDoc = createDocument("// Welcome to Genie IDE\n");
@@ -14,7 +15,7 @@ export default function App() {
 
   const currentDocument = documents.find(d => d.id === currentDocumentId);
 
-  /*  Handlers  */
+  /* Handlers */
 
   const handleCodeChange = (code) => {
     if (!currentDocument) return;
@@ -57,24 +58,69 @@ export default function App() {
   /* UI */
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100vh",
+        background: "#0E0F13",
+        color: "#ccc"
+      }}
+    >
+      {/* Tabs */}
       <Tabs
         documents={documents}
         currentDocumentId={currentDocumentId}
         onSelect={setCurrentDocumentId}
       />
 
-      <div style={{ display: "flex", flex: 1 }}>
+      {/* Main Area */}
+      <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
+        
         {/* Left Panel */}
-        <div style={{ width: 240, padding: 10, borderRight: "1px solid #222" , background: "#1e1e1e"}}>
-          <button onClick={handleNewFile}>New File</button>
+        <div
+          style={{
+            width: 240,
+            background: "#111318",
+            borderRight: "1px solid #1f2330",
+            padding: 12,
+            display: "flex",
+            flexDirection: "column",
+            gap: 12
+          }}
+        >
+          <div style={{ fontSize: 12, color: "#8b93a7" }}>
+            EXPLORER
+          </div>
 
-          <div style={{ marginTop: 20, color: "#ccc" }}>
-            <label>Language</label>
+          <button
+            onClick={handleNewFile}
+            style={{
+              background: "#1a1d27",
+              border: "1px solid #2a2f3d",
+              color: "#ccc",
+              padding: "6px 8px",
+              cursor: "pointer"
+            }}
+          >
+            + New File
+          </button>
+
+          <div>
+            <label style={{ fontSize: 12, color: "#8b93a7" }}>
+              LANGUAGE
+            </label>
             <select
               value={currentDocument?.language}
               onChange={handleLanguageChange}
-              style={{ width: "100%", marginTop: 5 }}
+              style={{
+                width: "100%",
+                marginTop: 6,
+                background: "#1a1d27",
+                color: "#ccc",
+                border: "1px solid #2a2f3d",
+                padding: 6
+              }}
             >
               {Object.keys(LANGUAGE_VERSIONS).map(lang => (
                 <option key={lang} value={lang}>
@@ -84,7 +130,7 @@ export default function App() {
             </select>
           </div>
 
-          <div style={{ marginTop: 10, fontSize: 12, color: "#b3b3b3" }}>
+          <div style={{ fontSize: 12, color: "#8b93a7" }}>
             Version:{" "}
             {currentDocument &&
               LANGUAGE_VERSIONS[currentDocument.language]}
@@ -92,11 +138,37 @@ export default function App() {
         </div>
 
         {/* Editor */}
-        <div style={{ flex: 1 }}>
+        <div style={{ flex: 2, background: "#0E0F13" }}>
           <CodeEditor
             document={currentDocument}
             onChange={handleCodeChange}
           />
+        </div>
+
+        {/* Output */}
+        <div
+          style={{
+            flex: 1,
+            background: "#111318",
+            borderLeft: "1px solid #1f2330",
+            display: "flex",
+            flexDirection: "column"
+          }}
+        >
+          <div
+            style={{
+              padding: "8px 10px",
+              fontSize: 12,
+              color: "#8b93a7",
+              borderBottom: "1px solid #1f2330"
+            }}
+          >
+            OUTPUT
+          </div>
+
+          <div style={{ flex: 1, overflow: "auto" }}>
+           
+          </div>
         </div>
       </div>
     </div>
