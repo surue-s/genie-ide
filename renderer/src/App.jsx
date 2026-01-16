@@ -3,7 +3,7 @@ import CodeEditor from "./editor/CodeEditor";
 import Tabs from "./editor/Tabs";
 import { createDocument } from "./core/document";
 import { LANGUAGE_VERSIONS } from "./core/constants";
-import Output from "./editor/Output";
+import Output from "./editor/Output"; // Make sure this import exists
 
 export default function App() {
   const initialDoc = createDocument("// Welcome to Genie IDE\n");
@@ -24,7 +24,7 @@ export default function App() {
       docs.map(doc =>
         doc.id === currentDocumentId
           ? {
-              ...doc,
+              ... doc,
               text: code,
               version: doc.version + 1,
               updatedAt: Date.now()
@@ -64,7 +64,7 @@ export default function App() {
         flexDirection: "column",
         height: "100vh",
         background: "#0E0F13",
-        color: "#ccc"
+        color:  "#ccc"
       }}
     >
       {/* Tabs */}
@@ -86,10 +86,10 @@ export default function App() {
             padding: 12,
             display: "flex",
             flexDirection: "column",
-            gap: 12
+            gap:  12
           }}
         >
-          <div style={{ fontSize: 12, color: "#8b93a7" }}>
+          <div style={{ fontSize:  12, color: "#8b93a7" }}>
             EXPLORER
           </div>
 
@@ -151,14 +151,14 @@ export default function App() {
             flex: 1,
             background: "#111318",
             borderLeft: "1px solid #1f2330",
-            display: "flex",
-            flexDirection: "column"
+            display:  "flex",
+            flexDirection:  "column"
           }}
         >
           <div
             style={{
               padding: "8px 10px",
-              fontSize: 12,
+              fontSize:  12,
               color: "#8b93a7",
               borderBottom: "1px solid #1f2330"
             }}
@@ -166,9 +166,7 @@ export default function App() {
             OUTPUT
           </div>
 
-          <div style={{ flex: 1, overflow: "auto" }}>
-           
-          </div>
+          <Output document={currentDocument} />
         </div>
       </div>
     </div>
