@@ -14,7 +14,7 @@ export default function App() {
 
   const currentDocument = documents.find(d => d.id === currentDocumentId);
 
-  /* -------- Handlers -------- */
+  /*  Handlers  */
 
   const handleCodeChange = (code) => {
     if (!currentDocument) return;
@@ -54,7 +54,7 @@ export default function App() {
     setCurrentDocumentId(newDoc.id);
   };
 
-  /* -------- UI -------- */
+  /* UI */
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>

@@ -1,33 +1,33 @@
-import { Button, Menu, Portal } from "@chakra-ui/react"
-import { LANGUAGE_VERSIONS } from "../core/constants"
+import { 
+  Menu, 
+  MenuButton, 
+  MenuList, 
+  MenuItem, 
+  Button,
+  Box 
+} from "@chakra-ui/react";
+import { LANGUAGE_VERSIONS } from "../core/constants";
 
-const languages = Object.entries(LANGUAGE_VERSIONS)
-const LanguageSelector = ({}) => {
+const languages = Object.entries(LANGUAGE_VERSIONS);
+
+export default function LanguageSelector({ currentDocument, onChangeLanguage }) {
   return (
     <Box>
-    <Menu.Root>
-      <Menu.Trigger asChild>
-        <Button variant="outline" size="sm">
-          Open
-        </Button>
-      </Menu.Trigger>
-      <Portal>
-        <Menu.Positioner>
-          <Menu.Content>
-            languages.map(([language, version]) => (
-              <Menu.Item key={language}>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => changeLanguage(doc, language)}
-                >
-                  {language}
-                </Button>
-              </Menu.Item>
-            ))
-        </Menu.Positioner>
-      </Portal>
-    </Menu.Root>
+      <Menu>
+        <MenuButton as={Button} variant="outline" size="sm">
+          {currentDocument?.language || 'Select Language'}
+        </MenuButton>
+        <MenuList>
+          {languages.map(([language, version]) => (
+            <MenuItem 
+              key={language}
+              onClick={() => onChangeLanguage(language)}
+            >
+              {language}
+            </MenuItem>
+          ))}
+        </MenuList>
+      </Menu>
     </Box>
-  )
+  );
 }
