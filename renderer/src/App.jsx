@@ -15,7 +15,7 @@ export default function App() {
 
   const [documents, setDocuments] = useState([initialDoc]);
   const [currentDocumentId, setCurrentDocumentId] = useState(initialDoc.id);
-  const [showHexNav, setShowHexNav] = useState(false);
+  const [showHexNav, setShowHexNav] = useState(true); // Start with hex view
   const [renamingDoc, setRenamingDoc] = useState(null);
   const [showShortcuts, setShowShortcuts] = useState(false);
   const editorRef = useRef(null);
@@ -134,12 +134,7 @@ export default function App() {
       }}
     >
       {/* Tabs */}
-      <Tabs
-        documents={documents}
-        currentDocumentId={currentDocumentId}
-        onSelect={setCurrentDocumentId}
-        onClose={handleCloseFile}
-      />
+   
 
       {/* Main Area */}
       <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
@@ -195,13 +190,14 @@ export default function App() {
             style={{
               background: showHexNav ? "#48bb78" : "#1a1d27",
               border: "1px solid #2a2f3d",
-              color: "#fff",
+              color: showHexNav ? "#000" : "#fff",
               padding: "6px 8px",
               cursor: "pointer",
               borderRadius: "4px",
+              fontWeight: showHexNav ? "bold" : "normal",
             }}
           >
-            {showHexNav ? "📝 Editor" : "🔷 Hex View"}
+            {showHexNav ? "📝 Code Editor" : "🔷 Hex Navigator"}
           </button>
 
           <button
@@ -257,7 +253,70 @@ export default function App() {
         </div>
 
         {/* Editor */}
-        <div style={{ flex: 2, background: "#0E0F13", position: "relative" }}>
+        <div style={{ flex: 2, background: "#0E0F13", position: "relative", display: "flex", flexDirection: "column" }}>
+          {/* Mini hex navigator (always visible in corner) */}
+          {!showHexNav && documents.length > 1 && (
+            <div
+              style={{
+                position: 'absolute',
+                top: 10,
+                right: 10,
+                width: 200,
+                height: 150,
+                backgroundColor: '#1a1d27',
+                border: '1px solid #2a2f3d',
+                borderRadius: 8,
+                zIndex: 10,
+                overflow: 'hidden',
+                cursor: 'pointer',
+              }}
+              onClick={() => setShowHexNav(true)}
+              title="Click to open full hex view"
+            >
+              <div style={{
+                padding: '6px 8px',
+                fontSize: 10,
+                color: '#888',
+                borderBottom: '1px solid #2a2f3d',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}>
+                <span>📁 Files ({documents.length})</span>
+                <span style={{ fontSize: 8 }}>Click to expand</span>
+              </div>
+              <div style={{
+                padding: 8,
+                maxHeight: 'calc(100% - 28px)',
+                overflowY: 'auto',
+                fontSize: 10,
+              }}>
+                {documents.map(doc => (
+                  <div
+                    key={doc.id}
+                    style={{
+                      padding: '4px 6px',
+                      marginBottom: 4,
+                      backgroundColor: doc.id === currentDocumentId ? '#48bb78' : '#0E0F13',
+                      color: doc.id === currentDocumentId ? '#000' : '#ccc',
+                      borderRadius: 3,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      cursor: 'pointer',
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCurrentDocumentId(doc.id);
+                    }}
+                  >
+                    {doc.title}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          
           {showHexNav ? (
             <HexFileNavigator
               documents={documents}

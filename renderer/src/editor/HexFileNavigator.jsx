@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { getFileColor } from "../core/fileExtensions";
+import { analyzeFileDependencies, getDependencyStrength, getDependencyColor } from "../core/dependencyAnalyzer";
 
-// Hexagonal file navigator inspired by Apple Watch
+// Hexagonal file navigator inspired by Apple Watch with dependency visualization
 export default function HexFileNavigator({ documents, currentDocumentId, onSelect, onClose, onRename }) {
+  const dependencies = analyzeFileDependencies(documents);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [offset, setOffset] = useState({ x: 0, y: 0 });
@@ -13,7 +15,7 @@ export default function HexFileNavigator({ documents, currentDocumentId, onSelec
   // Calculate hexagon positions in a honeycomb pattern
   const getHexPosition = (index, total) => {
     const hexSize = 70;
-    const hexSpacing = 85;
+    const hexSpacing = 90;
     
     // Create spiral pattern
     if (index === 0) return { x: 0, y: 0 };
@@ -74,10 +76,44 @@ export default function HexFileNavigator({ documents, currentDocumentId, onSelec
     }
   }, [isDragging, dragStart]);
 
+  // Draw connection line between two hexagons
+  const ConnectionLine = ({ from, to, strength }) => {
+    const fromPos = getHexPosition(from.index, documents.length);
+    const toPos = getHexPosition(to.index, documents.length);
+    
+    const color = getDependencyColor(strength);
+    const width = strength === 3 ? 2 : 1;
+    
+    return (
+      <svg
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          pointerEvents: 'none',
+          zIndex: 1,
+        }}
+      >
+        <line
+          x1={`calc(50% + ${fromPos.x}px)`}
+          y1={`calc(50% + ${fromPos.y}px)`}
+          x2={`calc(50% + ${toPos.x}px)`}
+          y2={`calc(50% + ${toPos.y}px)`}
+          stroke={color}
+          strokeWidth={width}
+          strokeDasharray={strength === 1 ? "5,5" : "none"}
+          opacity={0.6}
+        />
+      </svg>
+    );
+  };
+
   // Hexagon component
   const Hexagon = ({ doc, position, isActive, onHexClick, onHexClose }) => {
     const color = getFileColor(doc.title);
-    const size = 60;
+    const size = 65;
     
     return (
       <div
@@ -99,7 +135,7 @@ export default function HexFileNavigator({ documents, currentDocumentId, onSelec
             width: size,
             height: size * 1.15,
             transition: 'transform 0.2s ease',
-            transform: hoveredId === doc.id ? 'scale(1.1)' : 'scale(1)',
+            transform: hoveredId === doc.id ? 'scale(1.15)' : 'scale(1)',
           }}
         >
           {/* Hexagon shape using clip-path */}
@@ -112,26 +148,43 @@ export default function HexFileNavigator({ documents, currentDocumentId, onSelec
               border: isActive ? `3px solid ${color}` : '2px solid #3a3d45',
               boxShadow: isActive ? `0 0 20px ${color}40` : '0 4px 8px rgba(0,0,0,0.3)',
               display: 'flex',
+              flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
               position: 'relative',
+              padding: '4px',
             }}
           >
-            {/* File extension label */}
+            {/* File name - always visible */}
             <div
               style={{
                 color: isActive ? '#000' : '#fff',
-                fontSize: '11px',
+                fontSize: '9px',
                 fontWeight: 'bold',
                 textAlign: 'center',
-                padding: '0 8px',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
                 maxWidth: '90%',
+                marginBottom: '2px',
               }}
             >
-              {doc.title.split('.').pop().toUpperCase()}
+              {doc.title.length > 12 ? doc.title.substring(0, 10) + '..' : doc.title}
+            </div>
+            
+            {/* File extension badge */}
+            <div
+              style={{
+                color: isActive ? '#fff' : color,
+                fontSize: '8px',
+                fontWeight: '600',
+                textAlign: 'center',
+                backgroundColor: isActive ? color : 'transparent',
+                padding: '2px 4px',
+                borderRadius: '2px',
+              }}
+            >
+              .{doc.title.split('.').pop()}
             </div>
           </div>
           
@@ -165,28 +218,55 @@ export default function HexFileNavigator({ documents, currentDocumentId, onSelec
           )}
         </div>
         
-        {/* Filename tooltip */}
-        <div
-          style={{
-            position: 'absolute',
-            top: '100%',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            marginTop: 8,
-            padding: '4px 8px',
-            backgroundColor: '#1e1e1e',
-            border: '1px solid #3a3d45',
-            borderRadius: 4,
-            fontSize: 11,
-            color: '#ccc',
-            whiteSpace: 'nowrap',
-            pointerEvents: 'none',
-            opacity: hoveredId === doc.id ? 1 : 0,
-            transition: 'opacity 0.2s',
-          }}
-        >
-          {doc.title}
-        </div>
+        {/* Dependency indicator */}
+        {dependencies[doc.id] && (dependencies[doc.id].imports.length > 0 || dependencies[doc.id].importedBy.length > 0) && (
+          <div
+            style={{
+              position: 'absolute',
+              bottom: -8,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              fontSize: 8,
+              color: '#48bb78',
+              backgroundColor: '#1a1d27',
+              padding: '2px 4px',
+              borderRadius: 2,
+              border: '1px solid #48bb78',
+              whiteSpace: 'nowrap',
+              pointerEvents: 'none',
+            }}
+          >
+            {dependencies[doc.id].imports.length > 0 && `→${dependencies[doc.id].imports.length}`}
+            {dependencies[doc.id].imports.length > 0 && dependencies[doc.id].importedBy.length > 0 && ' '}
+            {dependencies[doc.id].importedBy.length > 0 && `←${dependencies[doc.id].importedBy.length}`}
+          </div>
+        )}
+        
+        {/* Full filename tooltip on hover */}
+        {doc.title.length > 12 && (
+          <div
+            style={{
+              position: 'absolute',
+              top: '100%',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              marginTop: 12,
+              padding: '4px 8px',
+              backgroundColor: '#1e1e1e',
+              border: '1px solid #3a3d45',
+              borderRadius: 4,
+              fontSize: 11,
+              color: '#ccc',
+              whiteSpace: 'nowrap',
+              pointerEvents: 'none',
+              opacity: hoveredId === doc.id ? 1 : 0,
+              transition: 'opacity 0.2s',
+              zIndex: 100,
+            }}
+          >
+            {doc.title}
+          </div>
+        )}
       </div>
     );
   };
@@ -214,12 +294,20 @@ export default function HexFileNavigator({ documents, currentDocumentId, onSelec
           top: 10,
           left: 10,
           fontSize: 10,
-          color: '#666',
+          color: '#888',
           pointerEvents: 'none',
           zIndex: 100,
+          backgroundColor: '#1a1d27',
+          padding: '6px 10px',
+          borderRadius: 4,
+          border: '1px solid #2a2f3d',
         }}
       >
-        Drag to pan • Scroll to zoom
+        <div>🖱️ Drag to pan • 🔍 Scroll to zoom</div>
+        <div style={{ fontSize: 9, color: '#666', marginTop: 2 }}>
+          <span style={{ color: '#48bb78' }}>━━</span> Direct import • 
+          <span style={{ color: '#666' }}> ┄┄</span> Reference
+        </div>
       </div>
 
       {/* File count */}
@@ -240,7 +328,7 @@ export default function HexFileNavigator({ documents, currentDocumentId, onSelec
         {documents.length} file{documents.length !== 1 ? 's' : ''}
       </div>
 
-      {/* Hexagons */}
+      {/* Hexagons and connections */}
       <div
         style={{
           position: 'absolute',
@@ -250,6 +338,26 @@ export default function HexFileNavigator({ documents, currentDocumentId, onSelec
           transition: isDragging ? 'none' : 'transform 0.1s ease',
         }}
       >
+        {/* Draw connection lines first (behind hexagons) */}
+        {documents.map((fromDoc, fromIndex) => {
+          return documents.map((toDoc, toIndex) => {
+            if (fromDoc.id === toDoc.id) return null;
+            
+            const strength = getDependencyStrength(fromDoc, toDoc, dependencies);
+            if (strength === 0) return null;
+            
+            return (
+              <ConnectionLine
+                key={`${fromDoc.id}-${toDoc.id}`}
+                from={{ ...fromDoc, index: fromIndex }}
+                to={{ ...toDoc, index: toIndex }}
+                strength={strength}
+              />
+            );
+          });
+        })}
+        
+        {/* Draw hexagons on top */}
         {documents.map((doc, index) => (
           <Hexagon
             key={doc.id}
