@@ -18,10 +18,15 @@ export default function App() {
   const [showHexNav, setShowHexNav] = useState(true);
   const [renamingDoc, setRenamingDoc] = useState(null);
   const [showShortcuts, setShowShortcuts] = useState(false);
-  const [outputHeight, setOutputHeight] = useState(150); // pixels
+  const [showOutput, setShowOutput] = useState(false);
+  const [outputHeight, setOutputHeight] = useState(250); // pixels
+  const [outputPosition, setOutputPosition] = useState({ top: 100, left: 100 });
   const [isResizingOutput, setIsResizingOutput] = useState(false);
+  const [isDraggingOutput, setIsDraggingOutput] = useState(false);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const editorRef = useRef(null);
   const outputRef = useRef(null);
+  const [hexNavSize, setHexNavSize] = useState({ width: 350, height: 300 });
 
   const currentDocument = documents.find(d => d.id === currentDocumentId);
 
@@ -98,6 +103,11 @@ export default function App() {
     setCurrentDocumentId(documents[prevIndex].id);
   };
 
+  const handleRunCode = () => {
+    setShowOutput(true);
+    outputRef.current?.runCode();
+  };
+
   // Keyboard shortcuts
   const handleKeyDown = useKeyboardShortcuts({
     onNewFile: handleNewFile,
@@ -106,7 +116,7 @@ export default function App() {
     onToggleHex: () => setShowHexNav(prev => !prev),
     onNextTab: handleNextTab,
     onPrevTab: handlePrevTab,
-    onRunCode: () => outputRef.current?.runCode(),
+    onRunCode: handleRunCode,
   });
 
   useEffect(() => {
@@ -122,31 +132,62 @@ export default function App() {
     return () => document.removeEventListener('keydown', handleKey);
   }, [handleKeyDown]);
 
-  // Output resize handler
-  const handleMouseDown = () => {
-    setIsResizingOutput(true);
+  // Output floating window drag handler
+  const handleOutputMouseDown = (e) => {
+    if (e.target.closest('[data-output-header]')) {
+      setIsDraggingOutput(true);
+      setDragOffset({
+        x: e.clientX - outputPosition.left,
+        y: e.clientY - outputPosition.top,
+      });
+    } else if (e.target.closest('[data-output-resize]')) {
+      setIsResizingOutput(true);
+    }
   };
 
   useEffect(() => {
-    if (!isResizingOutput) return;
+    if (isDraggingOutput) {
+      const handleMouseMove = (e) => {
+        setOutputPosition({
+          left: e.clientX - dragOffset.x,
+          top: e.clientY - dragOffset.y,
+        });
+      };
 
-    const handleMouseMove = (e) => {
-      const newHeight = Math.max(100, Math.min(500, window.innerHeight - e.clientY - 100));
-      setOutputHeight(newHeight);
-    };
+      const handleMouseUp = () => {
+        setIsDraggingOutput(false);
+      };
 
-    const handleMouseUp = () => {
-      setIsResizingOutput(false);
-    };
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
 
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [isDraggingOutput, dragOffset]);
 
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [isResizingOutput]);
+  useEffect(() => {
+    if (isResizingOutput) {
+      const handleMouseMove = (e) => {
+        const newHeight = Math.max(200, e.clientY - outputPosition.top - 30);
+        setOutputHeight(newHeight);
+      };
+
+      const handleMouseUp = () => {
+        setIsResizingOutput(false);
+      };
+
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [isResizingOutput, outputPosition]);
 
   /* UI */
 
@@ -244,7 +285,23 @@ export default function App() {
               fontSize: 12,
             }}
           >
-            {showHexNav ? "📝 Code" : "🔷 Graph"}
+            {showHexNav ? "�️ Graph" : "📝 Hide"}
+          </button>
+
+          <button
+            onClick={() => setShowOutput(!showOutput)}
+            style={{
+              background: showOutput ? "#4299e1" : "#1a1d27",
+              border: "1px solid #2a2f3d",
+              color: showOutput ? "#fff" : "#ccc",
+              padding: "6px 12px",
+              cursor: "pointer",
+              borderRadius: "4px",
+              fontWeight: showOutput ? "bold" : "normal",
+              fontSize: 12,
+            }}
+          >
+            {showOutput ? "▼ Output" : "▲ Output"}
           </button>
 
           <button
@@ -266,7 +323,7 @@ export default function App() {
       </div>
 
       {/* Main content area */}
-      <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
+      <div style={{ display: "flex", flex: 1, overflow: "hidden", position: "relative" }}>
         
         {/* Left Panel - Folder Manager */}
         <div
@@ -290,111 +347,39 @@ export default function App() {
           />
         </div>
 
-        {/* Right Panel - Hex Navigator (Always visible on right) */}
-        <div
-          style={{
-            width: 200,
-            background: "#111318",
-            borderLeft: "1px solid #1f2330",
-            display: "flex",
-            flexDirection: "column",
-            overflow: "hidden",
-          }}
-        >
-          <div
-            style={{
-              padding: "8px 10px",
-              fontSize: 11,
-              color: "#8b93a7",
-              borderBottom: "1px solid #1f2330",
-              fontWeight: "bold",
-            }}
-          >
-            FILES MAP
-          </div>
-          <div
-            style={{
-              flex: 1,
-              overflow: "hidden",
-              position: "relative",
-            }}
-          >
-            <HexFileNavigator
-              documents={documents}
-              currentDocumentId={currentDocumentId}
-              onSelect={setCurrentDocumentId}
-              onClose={handleCloseFile}
-              onRename={(id) => {
-                const doc = documents.find(d => d.id === id);
-                if (doc) setRenamingDoc(doc);
-              }}
-            />
-          </div>
-        </div>
-
-        {/* Center Panel - Code Editor + Output */}
+        {/* Center Panel - Code Editor (full height) */}
         <div
           style={{
             flex: 1,
             display: "flex",
             flexDirection: "column",
             minWidth: 0,
+            background: "#0E0F13",
           }}
         >
-          {/* Code Editor */}
-          <div
-            style={{
-              flex: 1,
-              background: "#0E0F13",
-              minHeight: 0,
-            }}
-          >
-            {showHexNav ? (
-              <div
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "#666",
-                }}
-              >
-                <div style={{ textAlign: "center" }}>
-                  <div style={{ fontSize: 14, marginBottom: 8 }}>Click on a file to edit</div>
-                  <div style={{ fontSize: 12, color: "#555" }}>or use the file explorer on the left</div>
-                </div>
-              </div>
-            ) : (
-              <CodeEditor
-                document={currentDocument}
-                onChange={handleCodeChange}
-                editorRef={editorRef}
-              />
-            )}
-          </div>
-
-          {/* Resize Handle */}
-          <div
-            onMouseDown={handleMouseDown}
-            style={{
-              height: 4,
-              background: "#1f2330",
-              cursor: "row-resize",
-              transition: isResizingOutput ? "none" : "background 0.2s",
-              backgroundColor: isResizingOutput ? "#48bb78" : "#1f2330",
-            }}
+          <CodeEditor
+            document={currentDocument}
+            onChange={handleCodeChange}
+            editorRef={editorRef}
           />
+        </div>
 
-          {/* Output Panel */}
+        {/* Floating Hex Navigator - Top Right */}
+        {showHexNav && (
           <div
             style={{
-              height: outputHeight,
+              position: "fixed",
+              top: 60,
+              right: 20,
+              width: hexNavSize.width,
+              height: hexNavSize.height,
               background: "#111318",
-              borderTop: "1px solid #1f2330",
+              border: "1px solid #2a2f3d",
+              borderRadius: "8px",
               display: "flex",
               flexDirection: "column",
-              minHeight: 100,
+              zIndex: 100,
+              boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
             }}
           >
             <div
@@ -404,15 +389,123 @@ export default function App() {
                 color: "#8b93a7",
                 borderBottom: "1px solid #1f2330",
                 fontWeight: "bold",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                cursor: "move",
+                userSelect: "none",
+              }}
+              data-hex-header
+            >
+              <span>FILES MAP</span>
+              <button
+                onClick={() => setShowHexNav(false)}
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  color: "#8b93a7",
+                  cursor: "pointer",
+                  fontSize: 14,
+                  padding: "0 4px",
+                }}
+              >
+                ×
+              </button>
+            </div>
+            <div
+              style={{
+                flex: 1,
+                overflow: "hidden",
+                position: "relative",
               }}
             >
-              OUTPUT
+              <HexFileNavigator
+                documents={documents}
+                currentDocumentId={currentDocumentId}
+                onSelect={setCurrentDocumentId}
+                onClose={handleCloseFile}
+                onRename={(id) => {
+                  const doc = documents.find(d => d.id === id);
+                  if (doc) setRenamingDoc(doc);
+                }}
+              />
             </div>
+          </div>
+        )}
+
+        {/* Floating Output Panel */}
+        {showOutput && (
+          <div
+            onMouseDown={handleOutputMouseDown}
+            style={{
+              position: "fixed",
+              top: outputPosition.top,
+              left: outputPosition.left,
+              width: 500,
+              height: outputHeight,
+              background: "#111318",
+              border: "1px solid #2a2f3d",
+              borderRadius: "8px",
+              display: "flex",
+              flexDirection: "column",
+              zIndex: 200,
+              boxShadow: "0 4px 12px rgba(0,0,0,0.5)",
+            }}
+          >
+            {/* Header - Draggable */}
+            <div
+              data-output-header
+              style={{
+                padding: "8px 10px",
+                fontSize: 11,
+                color: "#8b93a7",
+                borderBottom: "1px solid #1f2330",
+                fontWeight: "bold",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                cursor: "move",
+                userSelect: "none",
+                background: isDraggingOutput ? "#1a1d27" : "#111318",
+              }}
+            >
+              <span>OUTPUT</span>
+              <button
+                onClick={() => setShowOutput(false)}
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  color: "#8b93a7",
+                  cursor: "pointer",
+                  fontSize: 14,
+                  padding: "0 4px",
+                }}
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Content */}
             <div style={{ flex: 1, overflow: "hidden" }}>
               <Output ref={outputRef} editorRef={editorRef} language={currentDocument?.language} />
             </div>
+
+            {/* Resize Handle - Bottom Right */}
+            <div
+              data-output-resize
+              style={{
+                position: "absolute",
+                bottom: 0,
+                right: 0,
+                width: 20,
+                height: 20,
+                cursor: "nwse-resize",
+                background: isResizingOutput ? "rgba(72, 187, 120, 0.3)" : "transparent",
+              }}
+              title="Drag to resize"
+            />
           </div>
-        </div>
+        )}
       </div>
 
       {/* Rename Modal */}
