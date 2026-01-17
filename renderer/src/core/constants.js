@@ -1,11 +1,11 @@
-export const LANGUAGE_VERSIONS ={
-    javascript: "ES2020",
-    typescript: "ES2020",
-    python: "3.9.0",
-    c: "C17",
-    cpp: "C++17",
-    java: "Java 17",
-    go: "Go 1.17",
-    rust: "Rust 1.56.0",
-    swift: "Swift 5.5.1",
-}
+export const LANGUAGE_VERSIONS = {
+  javascript: "18.15.0",
+  typescript: "5.0.3",
+  python: "3.10.0",
+  java: "15.0.2",
+  c: "10.2.0",
+  cpp: "10.2.0",
+  go: "1.16.2",
+  rust: "1.68.2",
+  php: "8.2.3",
+};

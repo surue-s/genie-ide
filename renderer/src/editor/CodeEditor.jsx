@@ -1,8 +1,6 @@
 import Editor from "@monaco-editor/react";
-import { useRef } from "react";
 
-export default function CodeEditor({ document, onChange }) {
-  const editorRef = useRef(null);
+export default function CodeEditor({ document, onChange, editorRef }) {
 
   if (!document) {
     return (
@@ -26,7 +24,9 @@ export default function CodeEditor({ document, onChange }) {
       value={document.text}
       theme="vs-dark"
       onMount={(editor) => {
-        editorRef.current = editor;
+        if (editorRef) {
+          editorRef.current = editor;
+        }
       }}
       onChange={(value) => onChange?.(value ?? "")}
       options={{

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import CodeEditor from "./editor/CodeEditor";
 import Tabs from "./editor/Tabs";
 import { createDocument } from "./core/document";
@@ -12,6 +12,7 @@ export default function App() {
 
   const [documents, setDocuments] = useState([initialDoc]);
   const [currentDocumentId, setCurrentDocumentId] = useState(initialDoc.id);
+  const editorRef = useRef(null);
 
   const currentDocument = documents.find(d => d.id === currentDocumentId);
 
@@ -142,6 +143,7 @@ export default function App() {
           <CodeEditor
             document={currentDocument}
             onChange={handleCodeChange}
+            editorRef={editorRef}
           />
         </div>
 
@@ -166,7 +168,7 @@ export default function App() {
             OUTPUT
           </div>
 
-          <Output document={currentDocument} />
+          <Output editorRef={editorRef} language={currentDocument?.language} />
         </div>
       </div>
     </div>
