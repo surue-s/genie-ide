@@ -1,9 +1,14 @@
-export function createDocument(initialCode = "", title = "") {
+import { getExtensionForLanguage } from "./fileExtensions";
+
+export function createDocument(initialCode = "", title = "", language = "javascript") {
+  const ext = getExtensionForLanguage(language);
+  const defaultTitle = title || `untitled-${crypto.randomUUID().substring(0, 4)}${ext}`;
+  
   return {
     id: crypto.randomUUID(),
-    language: "javascript",
+    language: language,
     text: initialCode, 
-    title: title || `untitled-${crypto.randomUUID().substring(0, 4)}.js`,
+    title: defaultTitle,
     version: 1,
     updatedAt: Date.now(),
   };
@@ -20,8 +25,12 @@ export function updateDocument(doc, newText) {
 }
 
 export function changeLanguage(doc, newLanguage) {
+  const ext = getExtensionForLanguage(newLanguage);
+  const baseName = doc.title.substring(0, doc.title.lastIndexOf('.')) || doc.title;
+  
   return {
     ...doc,
-    language: newLanguage
+    language: newLanguage,
+    title: baseName + ext
   };
 }

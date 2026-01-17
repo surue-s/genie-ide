@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, forwardRef, useImperativeHandle } from "react";
 import { executeCode } from "../api";
 
-const Output = ({ editorRef, language }) => {
+const Output = forwardRef(({ editorRef, language }, ref) => {
   const [output, setOutput] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
@@ -44,6 +44,11 @@ const Output = ({ editorRef, language }) => {
     }
   };
 
+  // Expose runCode method to parent component
+  useImperativeHandle(ref, () => ({
+    runCode
+  }));
+
   return (
     <div style={{ width: "50%", padding: "10px" }}>
       <h2 style={{ marginBottom: "10px", fontSize: "18px" }}>Output</h2>
@@ -85,6 +90,6 @@ const Output = ({ editorRef, language }) => {
       </div>
     </div>
   );
-};
+});
 
 export default Output;
