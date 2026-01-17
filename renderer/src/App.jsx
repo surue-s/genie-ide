@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import CodeEditor from "./editor/CodeEditor";
-import Tabs from "./editor/Tabs";
+import FolderManager from "./editor/FolderManager";
 import HexFileNavigator from "./editor/HexFileNavigator";
 import FileRenameModal from "./editor/FileRenameModal";
 import ShortcutsHelp from "./editor/ShortcutsHelp";
@@ -15,9 +15,11 @@ export default function App() {
 
   const [documents, setDocuments] = useState([initialDoc]);
   const [currentDocumentId, setCurrentDocumentId] = useState(initialDoc.id);
-  const [showHexNav, setShowHexNav] = useState(true); // Start with hex view
+  const [showHexNav, setShowHexNav] = useState(true);
   const [renamingDoc, setRenamingDoc] = useState(null);
   const [showShortcuts, setShowShortcuts] = useState(false);
+  const [outputHeight, setOutputHeight] = useState(150); // pixels
+  const [isResizingOutput, setIsResizingOutput] = useState(false);
   const editorRef = useRef(null);
   const outputRef = useRef(null);
 
@@ -61,12 +63,11 @@ export default function App() {
   };
 
   const handleCloseFile = (docId) => {
-    if (documents.length === 1) return; // Keep at least one file
+    if (documents.length === 1) return;
 
     setDocuments(docs => {
       const filtered = docs.filter(d => d.id !== docId);
       
-      // If closing current document, switch to another
       if (docId === currentDocumentId && filtered.length > 0) {
         setCurrentDocumentId(filtered[0].id);
       }
@@ -121,6 +122,32 @@ export default function App() {
     return () => document.removeEventListener('keydown', handleKey);
   }, [handleKeyDown]);
 
+  // Output resize handler
+  const handleMouseDown = () => {
+    setIsResizingOutput(true);
+  };
+
+  useEffect(() => {
+    if (!isResizingOutput) return;
+
+    const handleMouseMove = (e) => {
+      const newHeight = Math.max(100, Math.min(500, window.innerHeight - e.clientY - 100));
+      setOutputHeight(newHeight);
+    };
+
+    const handleMouseUp = () => {
+      setIsResizingOutput(false);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isResizingOutput]);
+
   /* UI */
 
   return (
@@ -133,37 +160,28 @@ export default function App() {
         color: "#ccc"
       }}
     >
-      {/* Tabs */}
-   
-
-      {/* Main Area */}
-      <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
-        
-        {/* Left Panel */}
-        <div
-          style={{
-            width: 240,
-            background: "#111318",
-            borderRight: "1px solid #1f2330",
-            padding: 12,
-            display: "flex",
-            flexDirection: "column",
-            gap: 12
-          }}
-        >
-          <div style={{ fontSize: 12, color: "#8b93a7" }}>
-            EXPLORER
-          </div>
-
+      {/* Header with controls */}
+      <div
+        style={{
+          padding: "12px",
+          borderBottom: "1px solid #1f2330",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: 12,
+        }}
+      >
+        <div style={{ display: "flex", gap: 8 }}>
           <button
             onClick={handleNewFile}
             style={{
               background: "#1a1d27",
               border: "1px solid #2a2f3d",
               color: "#ccc",
-              padding: "6px 8px",
+              padding: "6px 12px",
               cursor: "pointer",
               borderRadius: "4px",
+              fontSize: 12,
             }}
           >
             + New File
@@ -176,14 +194,42 @@ export default function App() {
               background: "#1a1d27",
               border: "1px solid #2a2f3d",
               color: "#ccc",
-              padding: "6px 8px",
+              padding: "6px 12px",
               cursor: currentDocument ? "pointer" : "not-allowed",
               borderRadius: "4px",
               opacity: currentDocument ? 1 : 0.5,
+              fontSize: 12,
             }}
           >
-            Rename File
+            ✏️ Rename
           </button>
+        </div>
+
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          {currentDocument && (
+            <div style={{ fontSize: 11, color: "#888" }}>
+              {currentDocument.title}
+            </div>
+          )}
+          
+          <select
+            value={currentDocument?.language}
+            onChange={handleLanguageChange}
+            style={{
+              background: "#1a1d27",
+              color: "#ccc",
+              border: "1px solid #2a2f3d",
+              padding: "6px 8px",
+              borderRadius: "4px",
+              fontSize: 12,
+            }}
+          >
+            {Object.keys(LANGUAGE_VERSIONS).map(lang => (
+              <option key={lang} value={lang}>
+                {lang.toUpperCase()}
+              </option>
+            ))}
+          </select>
 
           <button
             onClick={() => setShowHexNav(!showHexNav)}
@@ -191,13 +237,14 @@ export default function App() {
               background: showHexNav ? "#48bb78" : "#1a1d27",
               border: "1px solid #2a2f3d",
               color: showHexNav ? "#000" : "#fff",
-              padding: "6px 8px",
+              padding: "6px 12px",
               cursor: "pointer",
               borderRadius: "4px",
               fontWeight: showHexNav ? "bold" : "normal",
+              fontSize: 12,
             }}
           >
-            {showHexNav ? "📝 Code Editor" : "🔷 Hex Navigator"}
+            {showHexNav ? "📝 Code" : "🔷 Graph"}
           </button>
 
           <button
@@ -206,118 +253,72 @@ export default function App() {
               background: "#1a1d27",
               border: "1px solid #2a2f3d",
               color: "#ccc",
-              padding: "6px 8px",
+              padding: "6px 12px",
               cursor: "pointer",
               borderRadius: "4px",
+              fontSize: 12,
             }}
             title="Show keyboard shortcuts"
           >
-            ❓ Help
+            ❓
           </button>
+        </div>
+      </div>
 
-          <div>
-            <label style={{ fontSize: 12, color: "#8b93a7" }}>
-              LANGUAGE
-            </label>
-            <select
-              value={currentDocument?.language}
-              onChange={handleLanguageChange}
-              style={{
-                width: "100%",
-                marginTop: 6,
-                background: "#1a1d27",
-                color: "#ccc",
-                border: "1px solid #2a2f3d",
-                padding: 6,
-                borderRadius: "4px",
-              }}
-            >
-              {Object.keys(LANGUAGE_VERSIONS).map(lang => (
-                <option key={lang} value={lang}>
-                  {lang.toUpperCase()}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div style={{ fontSize: 12, color: "#8b93a7" }}>
-            Version:{" "}
-            {currentDocument &&
-              LANGUAGE_VERSIONS[currentDocument.language]}
-          </div>
-
-          <div style={{ fontSize: 11, color: "#666", marginTop: "auto", paddingTop: 12, borderTop: "1px solid #1f2330" }}>
-            <div style={{ marginBottom: 4 }}>Files: {documents.length}</div>
-            <div>Press <kbd style={{ backgroundColor: "#2a2d35", padding: "2px 4px", borderRadius: 2 }}>?</kbd> for shortcuts</div>
-          </div>
+      {/* Main content area */}
+      <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
+        
+        {/* Left Panel - Folder Manager */}
+        <div
+          style={{
+            width: 220,
+            background: "#111318",
+            borderRight: "1px solid #1f2330",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          <FolderManager
+            documents={documents}
+            currentDocumentId={currentDocumentId}
+            onSelect={setCurrentDocumentId}
+            onClose={handleCloseFile}
+            onRename={(id) => {
+              const doc = documents.find(d => d.id === id);
+              if (doc) setRenamingDoc(doc);
+            }}
+          />
         </div>
 
-        {/* Editor */}
-        <div style={{ flex: 2, background: "#0E0F13", position: "relative", display: "flex", flexDirection: "column" }}>
-          {/* Mini hex navigator (always visible in corner) */}
-          {!showHexNav && documents.length > 1 && (
-            <div
-              style={{
-                position: 'absolute',
-                top: 10,
-                right: 10,
-                width: 200,
-                height: 150,
-                backgroundColor: '#1a1d27',
-                border: '1px solid #2a2f3d',
-                borderRadius: 8,
-                zIndex: 10,
-                overflow: 'hidden',
-                cursor: 'pointer',
-              }}
-              onClick={() => setShowHexNav(true)}
-              title="Click to open full hex view"
-            >
-              <div style={{
-                padding: '6px 8px',
-                fontSize: 10,
-                color: '#888',
-                borderBottom: '1px solid #2a2f3d',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}>
-                <span>📁 Files ({documents.length})</span>
-                <span style={{ fontSize: 8 }}>Click to expand</span>
-              </div>
-              <div style={{
-                padding: 8,
-                maxHeight: 'calc(100% - 28px)',
-                overflowY: 'auto',
-                fontSize: 10,
-              }}>
-                {documents.map(doc => (
-                  <div
-                    key={doc.id}
-                    style={{
-                      padding: '4px 6px',
-                      marginBottom: 4,
-                      backgroundColor: doc.id === currentDocumentId ? '#48bb78' : '#0E0F13',
-                      color: doc.id === currentDocumentId ? '#000' : '#ccc',
-                      borderRadius: 3,
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                      cursor: 'pointer',
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setCurrentDocumentId(doc.id);
-                    }}
-                  >
-                    {doc.title}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-          
-          {showHexNav ? (
+        {/* Right Panel - Hex Navigator (Always visible on right) */}
+        <div
+          style={{
+            width: 200,
+            background: "#111318",
+            borderLeft: "1px solid #1f2330",
+            display: "flex",
+            flexDirection: "column",
+            overflow: "hidden",
+          }}
+        >
+          <div
+            style={{
+              padding: "8px 10px",
+              fontSize: 11,
+              color: "#8b93a7",
+              borderBottom: "1px solid #1f2330",
+              fontWeight: "bold",
+            }}
+          >
+            FILES MAP
+          </div>
+          <div
+            style={{
+              flex: 1,
+              overflow: "hidden",
+              position: "relative",
+            }}
+          >
             <HexFileNavigator
               documents={documents}
               currentDocumentId={currentDocumentId}
@@ -328,37 +329,89 @@ export default function App() {
                 if (doc) setRenamingDoc(doc);
               }}
             />
-          ) : (
-            <CodeEditor
-              document={currentDocument}
-              onChange={handleCodeChange}
-              editorRef={editorRef}
-            />
-          )}
+          </div>
         </div>
 
-        {/* Output */}
+        {/* Center Panel - Code Editor + Output */}
         <div
           style={{
             flex: 1,
-            background: "#111318",
-            borderLeft: "1px solid #1f2330",
             display: "flex",
-            flexDirection: "column"
+            flexDirection: "column",
+            minWidth: 0,
           }}
         >
+          {/* Code Editor */}
           <div
             style={{
-              padding: "8px 10px",
-              fontSize: 12,
-              color: "#8b93a7",
-              borderBottom: "1px solid #1f2330"
+              flex: 1,
+              background: "#0E0F13",
+              minHeight: 0,
             }}
           >
-            OUTPUT
+            {showHexNav ? (
+              <div
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#666",
+                }}
+              >
+                <div style={{ textAlign: "center" }}>
+                  <div style={{ fontSize: 14, marginBottom: 8 }}>Click on a file to edit</div>
+                  <div style={{ fontSize: 12, color: "#555" }}>or use the file explorer on the left</div>
+                </div>
+              </div>
+            ) : (
+              <CodeEditor
+                document={currentDocument}
+                onChange={handleCodeChange}
+                editorRef={editorRef}
+              />
+            )}
           </div>
 
-          <Output ref={outputRef} editorRef={editorRef} language={currentDocument?.language} />
+          {/* Resize Handle */}
+          <div
+            onMouseDown={handleMouseDown}
+            style={{
+              height: 4,
+              background: "#1f2330",
+              cursor: "row-resize",
+              transition: isResizingOutput ? "none" : "background 0.2s",
+              backgroundColor: isResizingOutput ? "#48bb78" : "#1f2330",
+            }}
+          />
+
+          {/* Output Panel */}
+          <div
+            style={{
+              height: outputHeight,
+              background: "#111318",
+              borderTop: "1px solid #1f2330",
+              display: "flex",
+              flexDirection: "column",
+              minHeight: 100,
+            }}
+          >
+            <div
+              style={{
+                padding: "8px 10px",
+                fontSize: 11,
+                color: "#8b93a7",
+                borderBottom: "1px solid #1f2330",
+                fontWeight: "bold",
+              }}
+            >
+              OUTPUT
+            </div>
+            <div style={{ flex: 1, overflow: "hidden" }}>
+              <Output ref={outputRef} editorRef={editorRef} language={currentDocument?.language} />
+            </div>
+          </div>
         </div>
       </div>
 

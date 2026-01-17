@@ -1,0 +1,626 @@
+================================================================================
+GENIE IDE - COMPREHENSIVE TECHNICAL DOCUMENTATION
+Complete Methods, Dependencies, Libraries, and APIs Reference
+================================================================================
+
+PROJECT VERSION: 1.0.0
+BUILD DATE: January 17, 2026
+FRAMEWORK: React 19.2.3 + Electron 39.2.7
+
+================================================================================
+1. CORE DEPENDENCIES & LIBRARIES
+================================================================================
+
+PRIMARY DEPENDENCIES:
+- react@19.2.3                    - UI Framework & component library
+- react-dom@19.2.3                - React DOM rendering
+- @monaco-editor/react@4.7.0      - Advanced code editor (Microsoft Monaco)
+- monaco-editor@0.55.1            - Monaco editor core library
+- axios@1.13.2                    - HTTP client for API requests
+- electron@39.2.7                 - Desktop application framework
+
+DEV DEPENDENCIES:
+- @vitejs/plugin-react@5.1.2      - Vite React plugin for HMR
+- vite@7.3.1                      - Build tool and dev server
+- cross-env@7.0.3                 - Cross-platform environment variable tool
+
+BUILD TOOLS:
+- Vite 7.3.1                      - Lightning-fast frontend build tool
+- Node.js (via npm/npx)           - JavaScript runtime
+
+================================================================================
+2. EXTERNAL APIS & SERVICES
+================================================================================
+
+PISTON API (Code Execution Engine)
+├─ Base URL: https://emkc.org/api/v2/piston
+├─ Purpose: Execute code in multiple programming languages safely
+├─ Authentication: None (public API)
+├─ Rate Limiting: None (public service)
+└─ Supported Languages:
+    - JavaScript (18.15.0)
+    - TypeScript (5.0.3)
+    - Python (3.10.0)
+    - Java (15.0.2)
+    - C (10.2.0)
+    - C++ (10.2.0)
+    - Go (1.16.2)
+    - Rust (1.68.2)
+    - PHP (8.2.3)
+
+PISTON API ENDPOINTS:
+1. POST /execute
+   └─ Executes code and returns output
+   ├─ Request Body:
+   │  ├─ language: string (language identifier)
+   │  ├─ version: string (language version)
+   │  └─ files: Array<{content: string}>
+   └─ Response:
+      ├─ run: {output: string, stderr: string}
+      └─ compile: {output: string, stderr: string}
+
+================================================================================
+3. PROJECT STRUCTURE & MODULES
+================================================================================
+
+renderer/src/
+├── App.jsx
+│   └─ Main application component
+│      ├─ State Management: documents, currentDocumentId, outputHeight
+│      ├─ Methods: handleCodeChange, handleLanguageChange, handleNewFile
+│      └─ Features: File management, keyboard shortcuts, layout control
+│
+├── api.js
+│   └─ API integration module
+│      ├─ Function: executeCode(language, sourceCode)
+│      ├─ Axios Instance: baseURL = "https://emkc.org/api/v2/piston"
+│      └─ Returns: Promise<{run, compile}>
+│
+├── core/
+│   ├── constants.js
+│   │   └─ LANGUAGE_VERSIONS: object mapping languages to versions
+│   │
+│   ├── document.js
+│   │   ├─ createDocument(code, title, language): Creates file object
+│   │   ├─ updateDocument(doc, newText): Updates file content
+│   │   ├─ changeLanguage(doc, newLanguage): Changes file language
+│   │   └─ Properties: id, language, text, title, version, updatedAt
+│   │
+│   ├── fileExtensions.js
+│   │   ├─ LANGUAGE_EXTENSIONS: Language to file extension mapping
+│   │   ├─ getExtensionForLanguage(language): Returns file extension
+│   │   ├─ getLanguageFromExtension(filename): Reverse lookup
+│   │   ├─ getFileColor(filename): Returns hex color for file type
+│   │   ├─ isValidFilename(filename): Validates filename
+│   │   └─ sanitizeFilename(filename): Removes invalid characters
+│   │
+│   ├── dependencyAnalyzer.js
+│   │   ├─ analyzeFileDependencies(documents): Analyzes file imports
+│   │   ├─ extractImports(code, language): Regex-based import detection
+│   │   ├─ extractFileMentions(code, documents): File reference detection
+│   │   ├─ getDependencyStrength(fromDoc, toDoc): Connection strength
+│   │   ├─ getDependencyColor(strength): Color for visualization
+│   │   └─ Supports: JS, TS, Python, Java, C/C++, Go, Rust
+│   │
+│   └── shortcuts.js
+│       ├─ SHORTCUTS: Keyboard shortcut definitions
+│       ├─ useKeyboardShortcuts(handlers): Custom hook
+│       └─ Shortcuts: Ctrl+N, Ctrl+W, Ctrl+R, Ctrl+Enter, Ctrl+H, etc.
+│
+└── editor/
+    ├── App.jsx (See App.jsx above)
+    │
+    ├── CodeEditor.jsx
+    │   ├─ Component: Wraps Monaco Editor
+    │   ├─ Props: document, onChange, editorRef
+    │   ├─ Monaco Options:
+    │   │  ├─ automaticLayout: true
+    │   │  ├─ fontSize: 14
+    │   │  ├─ wordWrap: 'on'
+    │   │  ├─ smoothScrolling: true
+    │   │  └─ formatOnPaste: true
+    │   └─ Keyboard Shortcuts Mapped:
+    │      ├─ End key: cursorEnd
+    │      ├─ Home key: cursorHome
+    │      └─ Ctrl+S: Save (placeholder)
+    │
+    ├── Output.jsx
+    │   ├─ Component: Renders code execution output
+    │   ├─ Props: editorRef, language
+    │   ├─ Methods:
+    │   │  ├─ runCode(): Async function executes code via Piston API
+    │   │  └─ Exposed via useImperativeHandle
+    │   ├─ State:
+    │   │  ├─ output: string[] (lines)
+    │   │  ├─ isLoading: boolean
+    │   │  ├─ isError: boolean
+    │   │  └─ errorMessage: string
+    │   └─ Features: Error display, loading state, monospace rendering
+    │
+    ├── HexFileNavigator.jsx
+    │   ├─ Component: Hexagonal file visualization
+    │   ├─ Props: documents, currentDocumentId, onSelect, onClose
+    │   ├─ State: isDragging, offset, scale, hoveredId
+    │   ├─ Methods:
+    │   │  ├─ getHexPosition(index, total): Spiral honeycomb layout
+    │   │  ├─ handleMouseDown/Move/Up: Pan functionality
+    │   │  ├─ handleWheel: Zoom functionality
+    │   │  └─ ConnectionLine: SVG line renderer
+    │   ├─ Features:
+    │   │  ├─ Drag to pan
+    │   │  ├─ Scroll to zoom
+    │   │  ├─ Color-coded by file type
+    │   │  ├─ Dependency line visualization
+    │   │  └─ Always-visible filenames
+    │   └─ Dependencies: analyzeFileDependencies, getDependencyColor
+    │
+    ├── FolderManager.jsx
+    │   ├─ Component: VS Code-like file explorer
+    │   ├─ Props: documents, currentDocumentId, onSelect, onClose
+    │   ├─ State: expandedFolders (Set)
+    │   ├─ Methods:
+    │   │  ├─ groupFilesByFolder(): Organize files by path
+    │   │  ├─ toggleFolder(): Expand/collapse folder
+    │   │  ├─ FileItem: Individual file row
+    │   │  └─ FolderItem: Folder with collapse arrow
+    │   ├─ Features:
+    │   │  ├─ Hierarchical folder structure
+    │   │  ├─ Click to open file
+    │   │  ├─ Close button for each file
+    │   │  └─ File type color indicator
+    │   └─ Dependencies: getFileColor
+    │
+    ├── FileRenameModal.jsx
+    │   ├─ Component: Modal dialog for renaming files
+    │   ├─ Props: document, onRename, onClose
+    │   ├─ State: newName, error
+    │   ├─ Methods:
+    │   │  ├─ handleSubmit(): Validates and renames file
+    │   │  └─ Validation: Extension required, no invalid chars
+    │   └─ Features: Input focus, error display, confirm/cancel
+    │
+    ├── ShortcutsHelp.jsx
+    │   ├─ Component: Keyboard shortcuts reference modal
+    │   ├─ Props: onClose
+    │   ├─ Data Source: SHORTCUTS object from core/shortcuts.js
+    │   └─ Features: Displays all keyboard shortcuts with key combos
+    │
+    ├── Tabs.jsx
+    │   ├─ Component: File tabs bar (legacy, minimal use)
+    │   ├─ Props: documents, currentDocumentId, onSelect, onClose
+    │   └─ Features: Click to switch, X to close
+    │
+    └── LanguageSelector.jsx
+        ├─ Component: Language dropdown selector
+        ├─ Props: currentDocument, onChangeLanguage
+        └─ Features: Dropdown of all supported languages
+
+================================================================================
+4. KEY METHODS & FUNCTIONS
+================================================================================
+
+CORE DOCUMENT METHODS:
+├─ createDocument(code, title, language)
+│  └─ Returns: {id, language, text, title, version, updatedAt}
+│
+├─ changeLanguage(doc, language)
+│  └─ Updates file extension based on new language
+│
+└─ updateDocument(doc, newText)
+   └─ Increments version and updates timestamp
+
+FILE EXTENSION METHODS:
+├─ getExtensionForLanguage(language)
+│  └─ Maps language name to file extension
+│
+├─ getLanguageFromExtension(filename)
+│  └─ Reverse maps extension to language
+│
+├─ getFileColor(filename)
+│  └─ Returns color code for language
+│
+├─ isValidFilename(filename)
+│  └─ Regex check for invalid characters
+│
+└─ sanitizeFilename(filename)
+   └─ Removes invalid characters
+
+DEPENDENCY ANALYSIS METHODS:
+├─ analyzeFileDependencies(documents)
+│  └─ Main analysis function
+│     ├─ Returns: {[fileId]: {imports, importedBy, mentions}}
+│     └─ Runs: extractImports + extractFileMentions
+│
+├─ extractImports(code, language)
+│  └─ Language-specific regex parsing
+│     ├─ JavaScript: /import.*from|require/
+│     ├─ Python: /from.*import|import/
+│     ├─ Java: /import.*;/
+│     ├─ C/C++: /#include/
+│     ├─ Go: /import/
+│     └─ Rust: /use crate::/
+│
+├─ extractFileMentions(code, documents)
+│  └─ String matching for file name references
+│
+└─ getDependencyStrength(fromDoc, toDoc, dependencies)
+   └─ Returns: 0 (none), 1 (weak), 3 (strong)
+
+KEYBOARD SHORTCUT HANDLER:
+└─ useKeyboardShortcuts(handlers)
+   ├─ Ctrl+N: handleNewFile
+   ├─ Ctrl+W: handleCloseFile
+   ├─ Ctrl+R: handleRenameFile
+   ├─ Ctrl+Enter: handleRunCode
+   ├─ Ctrl+H: handleToggleHex
+   ├─ Ctrl+Tab: handleNextTab
+   └─ Ctrl+Shift+Tab: handlePrevTab
+
+API METHODS:
+├─ executeCode(language, sourceCode)
+│  └─ Async function
+│     ├─ Makes POST to Piston API
+│     ├─ Payload: {language, version, files: [{content}]}
+│     └─ Returns: {run: {output, stderr}, compile: {output, stderr}}
+│
+└─ axios.create({baseURL})
+   └─ HTTP client configuration
+
+REACT HOOKS USED:
+├─ useState()              - State management
+├─ useRef()               - DOM references
+├─ useEffect()            - Side effects, event listeners
+├─ useImperativeHandle()  - Expose imperative methods
+├─ forwardRef()           - Forward references to child components
+└─ Custom: useKeyboardShortcuts()
+
+================================================================================
+5. STATE MANAGEMENT ARCHITECTURE
+================================================================================
+
+APP LEVEL STATE:
+├─ documents: Document[]
+│  └─ Array of file objects with content, metadata
+│
+├─ currentDocumentId: string (UUID)
+│  └─ Currently active file ID
+│
+├─ showHexNav: boolean
+│  └─ Toggle between code editor and hex navigator
+│
+├─ renamingDoc: Document | null
+│  └─ File being renamed (controls modal)
+│
+├─ showShortcuts: boolean
+│  └─ Controls help modal visibility
+│
+├─ outputHeight: number (pixels)
+│  └─ Dynamic height of output panel
+│
+└─ isResizingOutput: boolean
+   └─ Tracks output resize drag operation
+
+OUTPUT COMPONENT STATE:
+├─ output: string[] | null
+│  └─ Execution output lines
+│
+├─ isLoading: boolean
+│  └─ Code execution in progress
+│
+├─ isError: boolean
+│  └─ Error occurred during execution
+│
+└─ errorMessage: string
+   └─ Error description
+
+HEX NAVIGATOR STATE:
+├─ isDragging: boolean
+│  └─ Pan operation in progress
+│
+├─ offset: {x, y}
+│  └─ Current pan offset
+│
+├─ scale: number
+│  └─ Zoom level (0.5 - 2.0)
+│
+└─ hoveredId: string | null
+   └─ Currently hovered hexagon
+
+FOLDER MANAGER STATE:
+└─ expandedFolders: Set<string>
+   └─ Set of open folder paths
+
+================================================================================
+6. DATA FLOW ARCHITECTURE
+================================================================================
+
+USER INPUT → EVENT HANDLER → STATE UPDATE → RE-RENDER → DISPLAY
+
+Example: Code Execution Flow
+1. User clicks "Run Code" button or presses Ctrl+Enter
+2. Output.runCode() is called
+3. Gets source code from editorRef.current.getValue()
+4. Calls executeCode(language, sourceCode) from api.js
+5. axios POST to https://emkc.org/api/v2/piston
+6. Piston API executes code in container
+7. Response with output/stderr
+8. Component updates state: setOutput(), setIsError()
+9. UI re-renders with new output
+
+Example: File Switch Flow
+1. User clicks file in FolderManager or HexFileNavigator
+2. onSelect callback triggered with fileId
+3. setCurrentDocumentId(fileId) called
+4. currentDocument changes via useMemo
+5. CodeEditor re-renders with new document.text
+6. Monaco editor displays new code
+
+Example: Dependency Visualization
+1. HexFileNavigator mounts
+2. analyzeFileDependencies(documents) runs
+3. Parses each file's code for imports
+4. Returns dependency graph: {fileId: {imports, importedBy}}
+5. For each file pair, getDependencyStrength() calculated
+6. ConnectionLine SVG rendered with appropriate color/style
+7. Dependency indicators shown below hexagons
+
+================================================================================
+7. FILE FORMAT SPECIFICATIONS
+================================================================================
+
+DOCUMENT OBJECT:
+{
+  id: string (UUID),                    // Unique identifier
+  language: string,                     // 'javascript', 'python', etc.
+  text: string,                         // Source code content
+  title: string,                        // Filename with extension
+  version: number,                      // Incremented on each change
+  updatedAt: number                     // Timestamp in milliseconds
+}
+
+PISTON API RESPONSE:
+{
+  run: {
+    output: string,                     // stdout
+    stderr: string,                     // stderr
+    exitCode: number
+  },
+  compile: {
+    output: string,
+    stderr: string
+  }
+}
+
+DEPENDENCY ANALYSIS RESULT:
+{
+  [fileId]: {
+    imports: string[],                  // Names of imported files
+    importedBy: string[],               // IDs of files importing this
+    mentions: string[]                  // IDs of files mentioning this
+  }
+}
+
+SHORTCUT DEFINITION:
+{
+  key: string,                          // Key code
+  ctrl: boolean,                        // Requires Ctrl
+  shift: boolean,                       // Requires Shift
+  description: string                   // Human-readable text
+}
+
+================================================================================
+8. STYLING & UI LIBRARIES
+================================================================================
+
+STYLING APPROACH: Inline styles (no CSS files)
+
+COLOR PALETTE:
+├─ Dark Background: #0E0F13, #111318, #1a1d27
+├─ Borders: #1f2330, #2a2f3d, #3a3d45
+├─ Text: #ccc, #fff, #8b93a7
+├─ Success/Primary: #48bb78 (green)
+├─ Error: #c53030, #ff4444, #fc8181
+├─ Warning: #f0ad4e (orange)
+└─ Info: #4299e1 (blue)
+
+FONT FAMILIES:
+├─ Default: System stack (sans-serif)
+├─ Code: 'monospace'
+
+LAYOUT PATTERNS:
+├─ flexbox for layouts
+├─ position: absolute/relative for overlays
+├─ CSS Grid for minimal usage
+├─ clip-path for hexagon shapes
+└─ SVG for dependency lines
+
+RESPONSIVE DESIGN:
+├─ Fixed panel widths (220px left, 200px right)
+├─ Resizable output panel (100-500px)
+├─ Flex-based center panel
+└─ Full viewport layout (100vh)
+
+================================================================================
+9. ERROR HANDLING
+================================================================================
+
+CODE EXECUTION ERRORS:
+├─ Network errors caught by try/catch
+├─ API errors shown in errorMessage
+├─ stderr displayed in red
+└─ User-friendly error formatting
+
+FILE OPERATION ERRORS:
+├─ Empty filename validation
+├─ Extension requirement validation
+├─ Character sanitization
+└─ At least one file must remain open
+
+EDITOR ERRORS:
+├─ Check editorRef.current exists before use
+├─ getValue() called safely after mount
+└─ Language change prevents undefined state
+
+================================================================================
+10. KEYBOARD SHORTCUTS REFERENCE
+================================================================================
+
+EDITOR NAVIGATION:
+├─ Ctrl+N       → New file
+├─ Ctrl+W       → Close current file
+├─ Ctrl+Tab     → Next tab
+├─ Ctrl+Shift+Tab → Previous tab
+└─ ?            → Show shortcuts help
+
+FILE OPERATIONS:
+├─ Ctrl+R       → Rename file
+└─ Ctrl+H       → Toggle hex graph view
+
+CODE EXECUTION:
+└─ Ctrl+Enter   → Run code
+
+MONACO EDITOR (Built-in):
+├─ Home          → Start of line
+├─ End           → End of line
+├─ Ctrl+/        → Toggle comment
+├─ Alt+Up/Down   → Move line
+├─ Shift+Alt+Up/Down → Duplicate line
+└─ Ctrl+F        → Find
+
+================================================================================
+11. PERFORMANCE CONSIDERATIONS
+================================================================================
+
+OPTIMIZATION STRATEGIES:
+├─ Lazy import for heavy components
+├─ Memoized dependency analysis
+├─ Event delegation for hex navigator
+├─ Ref-based DOM access (no re-renders)
+├─ SVG for dependency lines (lightweight)
+└─ Debounced resize handler for output
+
+POTENTIAL BOTTLENECKS:
+├─ Large file count → Dependency analysis O(n²)
+├─ Complex regex parsing → Use memoization
+├─ Many hexagons → Virtualize if >100 files
+├─ Large code files → Monaco handles well up to ~1MB
+└─ API latency → Network dependent (Piston)
+
+MEMORY MANAGEMENT:
+├─ Documents stored in state
+├─ Editor ref cleanup on unmount
+├─ Event listeners removed in cleanup
+└─ No global variables used
+
+================================================================================
+12. TESTING RECOMMENDATIONS
+================================================================================
+
+UNIT TEST TARGETS:
+├─ extractImports() with various languages
+├─ analyzeFileDependencies() with mock files
+├─ getLanguageFromExtension() edge cases
+├─ isValidFilename() special characters
+└─ getDependencyStrength() relationships
+
+INTEGRATION TEST TARGETS:
+├─ File creation → appears in explorer
+├─ File rename → updates all references
+├─ Import detection → shows in hex view
+├─ Code execution → output displays
+└─ Keyboard shortcuts → functions trigger
+
+E2E TEST TARGETS:
+├─ Complete workflow: new → edit → run → output
+├─ Multi-file with imports → dependency visualization
+├─ Language switching → extension updates
+└─ Panel resizing → layout adjusts
+
+================================================================================
+13. DEPLOYMENT & BUILD
+================================================================================
+
+BUILD COMMAND:
+npm run build
+
+DEV COMMAND:
+npm run dev:react              # Vite server only
+npm run dev:electron          # Full Electron app
+
+PRODUCTION CONSIDERATIONS:
+├─ Electron packaging for distribution
+├─ Code minification enabled
+├─ Monaco editor bundled
+├─ API calls to public Piston endpoint
+└─ No backend required (fully client-side)
+
+SUPPORTED PLATFORMS:
+├─ Windows (Electron)
+├─ macOS (Electron)
+├─ Linux (Electron)
+└─ Browser (Vite dev mode)
+
+================================================================================
+14. FUTURE ENHANCEMENTS
+================================================================================
+
+PLANNED FEATURES:
+├─ File persistence (local storage / IndexedDB)
+├─ Project templates
+├─ Collaborative editing
+├─ Custom theme support
+├─ Plugin system
+├─ Visual debugging
+├─ Git integration
+├─ Terminal panel
+├─ Search & replace
+├─ Multiple selections
+└─ Breadcrumb navigation
+
+ARCHITECTURE IMPROVEMENTS:
+├─ Move to Redux/Zustand for state
+├─ Extract styles to CSS modules
+├─ Create shared UI component library
+├─ Add TypeScript definitions
+├─ Implement service worker
+└─ Add error boundary components
+
+================================================================================
+15. TROUBLESHOOTING GUIDE
+================================================================================
+
+CODE WON'T EXECUTE:
+1. Check network connection
+2. Verify Piston API is online
+3. Ensure language is supported
+4. Check for syntax errors
+5. Try simpler code first
+
+HEX VIEW NOT SHOWING CONNECTIONS:
+1. Ensure files have import statements
+2. File names must match import paths
+3. Check language is supported
+4. Verify syntax is correct
+
+KEYBOARD SHORTCUTS NOT WORKING:
+1. Check focus is on window, not input
+2. Some shortcuts may be OS-reserved
+3. Monaco editor may override shortcuts
+4. Check for modifier key conflicts
+
+PERFORMANCE ISSUES:
+1. Limit files to <100 for dependency analysis
+2. Keep individual files <1MB
+3. Close unused files
+4. Restart application
+5. Check system resources
+
+================================================================================
+
+END OF DOCUMENTATION
+For questions or issues, refer to HEX_NAVIGATOR_GUIDE.md or NEW_FEATURES.md
+
+Generated: January 17, 2026
+Project: Genie IDE v1.0.0
+Language: JavaScript/React
+================================================================================
