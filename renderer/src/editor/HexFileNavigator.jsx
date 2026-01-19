@@ -40,40 +40,45 @@ export default function HexFileNavigator({ documents, currentDocumentId, onSelec
   };
 
   const handleMouseDown = (e) => {
-    if (e.target.classList.contains('hex-drag-area')) {
-      setIsDragging(true);
-      setDragStart({ x: e.clientX - offset.x, y: e.clientY - offset.y });
+    if (e.button !== 0) return; // Only left mouse button
+    
+    // Don't start dragging if clicking on a hexagon or button
+    if (e.target.closest('[data-hex-item]')) {
+      return;
     }
-  };
-
-  const handleMouseMove = (e) => {
-    if (isDragging) {
-      setOffset({
-        x: e.clientX - dragStart.x,
-        y: e.clientY - dragStart.y,
-      });
-    }
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
+    
+    setIsDragging(true);
+    setDragStart({ x: e.clientX - offset.x, y: e.clientY - offset.y });
   };
 
   const handleWheel = (e) => {
+    if (!containerRef.current) return;
     e.preventDefault();
     const delta = e.deltaY > 0 ? -0.1 : 0.1;
     setScale(prev => Math.max(0.5, Math.min(2, prev + delta)));
   };
 
   useEffect(() => {
-    if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-      return () => {
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
-      };
-    }
+    if (!isDragging) return;
+
+    const handleMouseMoveDocument = (e) => {
+      setOffset({
+        x: e.clientX - dragStart.x,
+        y: e.clientY - dragStart.y,
+      });
+    };
+
+    const handleMouseUpDocument = () => {
+      setIsDragging(false);
+    };
+
+    document.addEventListener('mousemove', handleMouseMoveDocument);
+    document.addEventListener('mouseup', handleMouseUpDocument);
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMoveDocument);
+      document.removeEventListener('mouseup', handleMouseUpDocument);
+    };
   }, [isDragging, dragStart]);
 
   // Draw connection line between two hexagons
@@ -117,6 +122,7 @@ export default function HexFileNavigator({ documents, currentDocumentId, onSelec
     
     return (
       <div
+        data-hex-item
         style={{
           position: 'absolute',
           left: `calc(50% + ${position.x}px)`,
@@ -274,7 +280,6 @@ export default function HexFileNavigator({ documents, currentDocumentId, onSelec
   return (
     <div
       ref={containerRef}
-      className="hex-drag-area"
       onMouseDown={handleMouseDown}
       onWheel={handleWheel}
       style={{
