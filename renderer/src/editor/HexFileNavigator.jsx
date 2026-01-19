@@ -130,6 +130,7 @@ export default function HexFileNavigator({ documents, currentDocumentId, onSelec
           transform: 'translate(-50%, -50%)',
           cursor: 'pointer',
           transition: 'all 0.2s ease',
+          filter: isActive ? 'drop-shadow(0 0 16px #b8a4c9) drop-shadow(0 0 8px #9fa8d6)' : 'none',
         }}
         onMouseEnter={() => setHoveredId(doc.id)}
         onMouseLeave={() => setHoveredId(null)}
@@ -149,10 +150,12 @@ export default function HexFileNavigator({ documents, currentDocumentId, onSelec
             style={{
               width: '100%',
               height: '100%',
-              backgroundColor: isActive ? color : '#f1ebef',
+              backgroundColor: color,
               clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)',
-              border: isActive ? `3px solid ${color}` : '1px solid #e2d8e0',
-              boxShadow: isActive ? `0 4px 12px ${color}30` : '0 2px 4px rgba(46, 42, 47, 0.08)',
+              border: isActive ? `3px solid #b8a4c9` : '1px solid rgba(46, 42, 47, 0.15)',
+              boxShadow: isActive 
+                ? `0 0 20px rgba(184, 164, 201, 0.6), 0 0 40px rgba(159, 168, 214, 0.4), inset 0 0 10px rgba(255, 255, 255, 0.3)` 
+                : '0 2px 4px rgba(46, 42, 47, 0.08)',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
@@ -164,8 +167,8 @@ export default function HexFileNavigator({ documents, currentDocumentId, onSelec
             {/* File name - always visible */}
             <div
               style={{
-                color: isActive ? '#fff' : '#2e2a2f',
-                fontSize: '9px',
+                color: '#fff',
+                fontSize: '10px',
                 fontWeight: 'bold',
                 textAlign: 'center',
                 overflow: 'hidden',
@@ -173,6 +176,7 @@ export default function HexFileNavigator({ documents, currentDocumentId, onSelec
                 whiteSpace: 'nowrap',
                 maxWidth: '90%',
                 marginBottom: '2px',
+                textShadow: '0 1px 3px rgba(0, 0, 0, 0.4), 0 0 8px rgba(0, 0, 0, 0.3)',
               }}
             >
               {doc.title.length > 12 ? doc.title.substring(0, 10) + '..' : doc.title}
@@ -181,13 +185,14 @@ export default function HexFileNavigator({ documents, currentDocumentId, onSelec
             {/* File extension badge */}
             <div
               style={{
-                color: isActive ? '#fff' : color,
+                color: '#fff',
                 fontSize: '8px',
                 fontWeight: '600',
                 textAlign: 'center',
-                backgroundColor: isActive ? color : 'transparent',
-                padding: '2px 4px',
-                borderRadius: '3px',
+                backgroundColor: 'rgba(0, 0, 0, 0.2)',
+                padding: '2px 5px',
+                borderRadius: '4px',
+                textShadow: '0 1px 2px rgba(0, 0, 0, 0.4)',
               }}
             >
               .{doc.title.split('.').pop()}

@@ -22,6 +22,7 @@ export default function App() {
   const [hexNavHeight, setHexNavHeight] = useState(300); // pixels
   const [outputHeight, setOutputHeight] = useState(250); // pixels
   const [isResizingPanel, setIsResizingPanel] = useState(false);
+  const [isResizingRightPanel, setIsResizingRightPanel] = useState(false);
   const editorRef = useRef(null);
   const outputRef = useRef(null);
   const [rightPanelWidth, setRightPanelWidth] = useState(300);
@@ -130,10 +131,12 @@ export default function App() {
     return () => document.removeEventListener('keydown', handleKey);
   }, [handleKeyDown]);
 
-  // Output floating window drag handler
+  // Panel resize handlers
   const handlePanelMouseDown = (e) => {
     if (e.target.closest('[data-divider]')) {
       setIsResizingPanel(true);
+    } else if (e.target.closest('[data-right-resize]')) {
+      setIsResizingRightPanel(true);
     }
   };
 
@@ -164,6 +167,29 @@ export default function App() {
       };
     }
   }, [isResizingPanel]);
+
+  useEffect(() => {
+    if (isResizingRightPanel) {
+      const handleMouseMove = (e) => {
+        const minWidth = 260;
+        const maxWidth = 600;
+        const newWidth = Math.max(minWidth, Math.min(maxWidth, window.innerWidth - e.clientX));
+        setRightPanelWidth(newWidth);
+      };
+
+      const handleMouseUp = () => {
+        setIsResizingRightPanel(false);
+      };
+
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [isResizingRightPanel]);
 
   /* UI */
 
@@ -380,9 +406,32 @@ export default function App() {
               borderLeft: "1px solid #e8dfe6",
               display: "flex",
               flexDirection: "column",
+              position: "relative",
             }}
             onMouseDown={handlePanelMouseDown}
           >
+            {/* Left resize handle for right panel */}
+            <div
+              data-right-resize
+              style={{
+                position: "absolute",
+                left: 0,
+                top: 0,
+                bottom: 0,
+                width: 4,
+                cursor: "ew-resize",
+                background: isResizingRightPanel ? "#c89fb6" : "transparent",
+                transition: isResizingRightPanel ? "none" : "background 120ms ease-out",
+                zIndex: 10,
+              }}
+              onMouseEnter={(e) => {
+                if (!isResizingRightPanel) e.currentTarget.style.background = "#e8dfe6";
+              }}
+              onMouseLeave={(e) => {
+                if (!isResizingRightPanel) e.currentTarget.style.background = "transparent";
+              }}
+              title="Drag to resize panel"
+            />
             {/* Hex Navigator */}
             <div
               style={{
