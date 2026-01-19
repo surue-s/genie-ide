@@ -11,6 +11,7 @@ export default function ThemeControl({ currentTheme, onThemeChange }) {
   useEffect(() => {
     if (!isOpen) return;
     
+    
     function handleClickOutside(e) {
       if (
         menuRef.current && 
@@ -167,22 +168,22 @@ export default function ThemeControl({ currentTheme, onThemeChange }) {
                     width: 12,
                     height: 12,
                     borderRadius: 3,
-                    background: theme.preview.bg,
-                    border: `1px solid ${colors.borderSubtle}`,
+                    background: theme.preview.background,
+                    border: `1px solid ${theme.preview.border}`,
                   }} />
                   <div style={{
                     width: 12,
                     height: 12,
                     borderRadius: 3,
                     background: theme.preview.accent,
-                    border: `1px solid ${colors.borderSubtle}`,
+                    border: `1px solid ${theme.preview.border}`,
                   }} />
                   <div style={{
                     width: 12,
                     height: 12,
                     borderRadius: 3,
-                    background: theme.preview.text,
-                    border: `1px solid ${colors.borderSubtle}`,
+                    background: theme.preview.textPrimary,
+                    border: `1px solid ${theme.preview.border}`,
                   }} />
                 </div>
                 

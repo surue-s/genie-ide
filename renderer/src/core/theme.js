@@ -127,11 +127,15 @@ export function getAvailableThemes() {
     key,
     name: theme.name,
     type: theme.type,
-    preview: {
-      bg: theme.colors.bgPanel,
-      accent: theme.colors.accentMint,
-      text: theme.colors.textPrimary,
-    }
+   preview: {
+  background: theme.colors.bgPanel,
+  surface: theme.colors.surfaceRaised,
+  border: theme.colors.borderSubtle,
+  accent: theme.colors.accentRose,
+  textPrimary: theme.colors.textPrimary,
+  textSecondary: theme.colors.textMuted,
+}
+
   }));
 }
 
