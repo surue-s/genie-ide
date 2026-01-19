@@ -312,7 +312,7 @@ export default function HexFileNavigator({ documents, currentDocumentId, onSelec
           border: '1px solid #e2d8e0',
         }}
       >
-        <div>🖱️ Drag to pan • 🔍 Scroll to zoom</div>
+        <div>Drag to pan • Scroll to zoom</div>
         <div style={{ fontSize: 10, color: '#b8a0b6', marginTop: 3 }}>
           <span style={{ color: '#c89fb6' }}>━━</span> Direct import • 
           <span style={{ color: '#d0c5d6' }}> ┄┄</span> Reference

@@ -25,8 +25,8 @@ export default function CodeEditor({ document, onChange, editorRef }) {
     return (
       <div style={{
         height: "100%",
-        background: "#1e1e1e",
-        color: "#ccc",
+        background: "#f6f2f4",
+        color: "#5f5a63",
         display: "flex",
         alignItems: "center",
         justifyContent: "center"
@@ -66,7 +66,7 @@ export default function CodeEditor({ document, onChange, editorRef }) {
       height="100%"
       language={monacoLanguage}
       value={document.text}
-      theme="vs-dark"
+      theme="vs-light"
       beforeMount={(monaco) => {
         // Ensure all language definitions are available before mount
         const langIds = ['python', 'java', 'c', 'cpp', 'go', 'rust', 'php'];

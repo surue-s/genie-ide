@@ -24,7 +24,7 @@ export default function App() {
   const [isResizingPanel, setIsResizingPanel] = useState(false);
   const editorRef = useRef(null);
   const outputRef = useRef(null);
-  const [rightPanelWidth, setRightPanelWidth] = useState(400);
+  const [rightPanelWidth, setRightPanelWidth] = useState(300);
 
   const currentDocument = documents.find(d => d.id === currentDocumentId);
 
@@ -203,12 +203,11 @@ export default function App() {
               fontSize: 13,
               fontWeight: 500,
               transition: "all 120ms ease-out",
-              hover: { background: "#ede7eb" },
             }}
-            onMouseEnter={(e) => e.target.style.background = "#ede7eb"}
-            onMouseLeave={(e) => e.target.style.background = "#f1ebef"}
+            onMouseEnter={(e) => e.currentTarget.style.background = "#ede7eb"}
+            onMouseLeave={(e) => e.currentTarget.style.background = "#f1ebef"}
           >
-            + New File
+            New File
           </button>
 
           <button
@@ -229,7 +228,7 @@ export default function App() {
             onMouseEnter={(e) => currentDocument && (e.target.style.background = "#ede7eb")}
             onMouseLeave={(e) => e.target.style.background = "#f1ebef"}
           >
-            ✏️ Rename
+            Rename
           </button>
         </div>
 
@@ -278,13 +277,13 @@ export default function App() {
               transition: "all 120ms ease-out",
             }}
             onMouseEnter={(e) => {
-              if (!showHexNav) e.target.style.background = "#ede7eb";
+              if (!showHexNav) e.currentTarget.style.background = "#ede7eb";
             }}
             onMouseLeave={(e) => {
-              e.target.style.background = showHexNav ? "#c89fb6" : "#f1ebef";
+              e.currentTarget.style.background = showHexNav ? "#c89fb6" : "#f1ebef";
             }}
           >
-            📊 Graph
+            Graph
           </button>
 
           <button
@@ -301,13 +300,13 @@ export default function App() {
               transition: "all 120ms ease-out",
             }}
             onMouseEnter={(e) => {
-              if (!showOutput) e.target.style.background = "#ede7eb";
+              if (!showOutput) e.currentTarget.style.background = "#ede7eb";
             }}
             onMouseLeave={(e) => {
-              e.target.style.background = showOutput ? "#b8a4c9" : "#f1ebef";
+              e.currentTarget.style.background = showOutput ? "#b8a4c9" : "#f1ebef";
             }}
           >
-            ▼ Output
+            Output
           </button>
 
           <button
@@ -323,11 +322,11 @@ export default function App() {
               fontWeight: 500,
               transition: "all 120ms ease-out",
             }}
-            onMouseEnter={(e) => e.target.style.background = "#ede7eb"}
-            onMouseLeave={(e) => e.target.style.background = "#f1ebef"}
+            onMouseEnter={(e) => e.currentTarget.style.background = "#ede7eb"}
+            onMouseLeave={(e) => e.currentTarget.style.background = "#f1ebef"}
             title="Show keyboard shortcuts"
           >
-            ❓
+            Shortcuts
           </button>
         </div>
       </div>

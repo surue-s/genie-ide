@@ -49,21 +49,20 @@ export default function FolderManager({ documents, currentDocumentId, onSelect, 
         onClick={() => onSelect(doc.id)}
         style={{
           paddingLeft: `${12 + level * 16}px`,
-          padding: '6px 8px',
-          marginBottom: 2,
-          backgroundColor: doc.id === currentDocumentId ? '#48bb78' : 'transparent',
-          color: doc.id === currentDocumentId ? '#000' : '#ccc',
+          padding: '8px 10px',
+          marginBottom: 4,
+          backgroundColor: doc.id === currentDocumentId ? '#c89fb6' : 'transparent',
+          color: doc.id === currentDocumentId ? '#fff' : '#2e2a2f',
           cursor: 'pointer',
-          borderRadius: 3,
+          borderRadius: 8,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          group: 'hover',
-          transition: 'background-color 0.2s',
+          transition: 'background-color 0.15s ease-out,color 0.15s ease-out',
         }}
         onMouseEnter={(e) => {
           if (doc.id !== currentDocumentId) {
-            e.currentTarget.style.backgroundColor = '#2a2d35';
+            e.currentTarget.style.backgroundColor = '#f1ebef';
           }
         }}
         onMouseLeave={(e) => {
@@ -72,9 +71,9 @@ export default function FolderManager({ documents, currentDocumentId, onSelect, 
           }
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0, flex: 1 }}>
-          <span style={{ fontSize: 12, color: color }}>●</span>
-          <span style={{ fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, flex: 1 }}>
+          <span style={{ fontSize: 10, color: color }}>◆</span>
+          <span style={{ fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: '#2e2a2f' }}>
             {fileName}
           </span>
         </div>
@@ -86,14 +85,17 @@ export default function FolderManager({ documents, currentDocumentId, onSelect, 
             }
           }}
           style={{
-            background: 'none',
+            background: 'transparent',
             border: 'none',
-            color: '#888',
+            color: '#8c8791',
             cursor: documents.length > 1 ? 'pointer' : 'not-allowed',
             fontSize: 12,
-            padding: '2px 4px',
-            opacity: documents.length > 1 ? 1 : 0.5,
+            padding: '2px 6px',
+            opacity: documents.length > 1 ? 0.9 : 0.4,
+            transition: 'color 0.12s ease-out',
           }}
+          onMouseEnter={(e) => documents.length > 1 && (e.currentTarget.style.color = '#2e2a2f')}
+          onMouseLeave={(e) => e.currentTarget.style.color = '#8c8791'}
         >
           ×
         </button>
@@ -112,29 +114,31 @@ export default function FolderManager({ documents, currentDocumentId, onSelect, 
           onClick={() => toggleFolder(folderPath)}
           style={{
             paddingLeft: `${12 + level * 16}px`,
-            padding: '6px 8px',
+            padding: '8px 10px',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
-            gap: 6,
-            color: '#bbb',
+            gap: 8,
+            color: '#5f5a63',
             fontSize: 12,
             userSelect: 'none',
-            transition: 'background-color 0.2s',
+            transition: 'background-color 0.15s ease-out',
+            borderRadius: 8,
+            marginBottom: 4,
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = '#2a2d35';
+            e.currentTarget.style.backgroundColor = '#f1ebef';
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.backgroundColor = 'transparent';
           }}
         >
-          <span style={{ fontSize: 10, minWidth: 10 }}>
-            {isExpanded ? '▼' : '▶'}
+          <span style={{ fontSize: 11, minWidth: 12, color: '#8c8791' }}>
+            {isExpanded ? '▾' : '▸'}
           </span>
-          <span style={{ fontSize: 10, color: '#f0ad4e' }}>📁</span>
-          <span>{folderName}</span>
-          <span style={{ fontSize: 10, color: '#888', marginLeft: 'auto' }}>
+          <span style={{ fontSize: 11, color: '#5f5a63' }}>▢</span>
+          <span style={{ fontWeight: 600 }}>{folderName}</span>
+          <span style={{ fontSize: 11, color: '#8c8791', marginLeft: 'auto' }}>
             {fileCount}
           </span>
         </div>
@@ -149,16 +153,18 @@ export default function FolderManager({ documents, currentDocumentId, onSelect, 
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        backgroundColor: '#111318',
+        backgroundColor: '#fbf8fa',
       }}
     >
       <div
         style={{
-          padding: '12px',
-          borderBottom: '1px solid #1f2330',
+          padding: '12px 14px',
+          borderBottom: '1px solid #e8dfe6',
           fontSize: 12,
-          color: '#8b93a7',
-          fontWeight: 'bold',
+          color: '#5f5a63',
+          fontWeight: 700,
+          letterSpacing: '0.5px',
+          textTransform: 'uppercase',
         }}
       >
         EXPLORER
@@ -168,7 +174,7 @@ export default function FolderManager({ documents, currentDocumentId, onSelect, 
         style={{
           flex: 1,
           overflowY: 'auto',
-          padding: '8px 0',
+          padding: '10px 0',
         }}
       >
         {/* Root files */}
