@@ -18,15 +18,13 @@ export default function App() {
   const [showHexNav, setShowHexNav] = useState(true);
   const [renamingDoc, setRenamingDoc] = useState(null);
   const [showShortcuts, setShowShortcuts] = useState(false);
-  const [showOutput, setShowOutput] = useState(false);
+  const [showOutput, setShowOutput] = useState(true);
+  const [hexNavHeight, setHexNavHeight] = useState(300); // pixels
   const [outputHeight, setOutputHeight] = useState(250); // pixels
-  const [outputPosition, setOutputPosition] = useState({ top: 100, left: 100 });
-  const [isResizingOutput, setIsResizingOutput] = useState(false);
-  const [isDraggingOutput, setIsDraggingOutput] = useState(false);
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [isResizingPanel, setIsResizingPanel] = useState(false);
   const editorRef = useRef(null);
   const outputRef = useRef(null);
-  const [hexNavSize, setHexNavSize] = useState({ width: 350, height: 300 });
+  const [rightPanelWidth, setRightPanelWidth] = useState(400);
 
   const currentDocument = documents.find(d => d.id === currentDocumentId);
 
@@ -133,29 +131,28 @@ export default function App() {
   }, [handleKeyDown]);
 
   // Output floating window drag handler
-  const handleOutputMouseDown = (e) => {
-    if (e.target.closest('[data-output-header]')) {
-      setIsDraggingOutput(true);
-      setDragOffset({
-        x: e.clientX - outputPosition.left,
-        y: e.clientY - outputPosition.top,
-      });
-    } else if (e.target.closest('[data-output-resize]')) {
-      setIsResizingOutput(true);
+  const handlePanelMouseDown = (e) => {
+    if (e.target.closest('[data-divider]')) {
+      setIsResizingPanel(true);
     }
   };
 
   useEffect(() => {
-    if (isDraggingOutput) {
+    if (isResizingPanel) {
       const handleMouseMove = (e) => {
-        setOutputPosition({
-          left: e.clientX - dragOffset.x,
-          top: e.clientY - dragOffset.y,
-        });
+        // Calculate new hex nav height based on mouse movement
+        const minHexHeight = 100;
+        const minOutputHeight = 100;
+        const headerHeight = 60;
+        const dividerHeight = 4;
+        const maxHexHeight = window.innerHeight - headerHeight - minOutputHeight - dividerHeight;
+        
+        const newHexHeight = Math.max(minHexHeight, Math.min(maxHexHeight, e.clientY - headerHeight));
+        setHexNavHeight(newHexHeight);
       };
 
       const handleMouseUp = () => {
-        setIsDraggingOutput(false);
+        setIsResizingPanel(false);
       };
 
       document.addEventListener('mousemove', handleMouseMove);
@@ -166,28 +163,7 @@ export default function App() {
         document.removeEventListener('mouseup', handleMouseUp);
       };
     }
-  }, [isDraggingOutput, dragOffset]);
-
-  useEffect(() => {
-    if (isResizingOutput) {
-      const handleMouseMove = (e) => {
-        const newHeight = Math.max(200, e.clientY - outputPosition.top - 30);
-        setOutputHeight(newHeight);
-      };
-
-      const handleMouseUp = () => {
-        setIsResizingOutput(false);
-      };
-
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-
-      return () => {
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
-      };
-    }
-  }, [isResizingOutput, outputPosition]);
+  }, [isResizingPanel]);
 
   /* UI */
 
@@ -285,7 +261,7 @@ export default function App() {
               fontSize: 12,
             }}
           >
-            {showHexNav ? "�️ Graph" : "📝 Hide"}
+            {showHexNav ? "📊 Graph" : "📝 Hide"}
           </button>
 
           <button
@@ -321,8 +297,6 @@ export default function App() {
           </button>
         </div>
       </div>
-
-      {/* Main content area */}
       <div style={{ display: "flex", flex: 1, overflow: "hidden", position: "relative" }}>
         
         {/* Left Panel - Folder Manager */}
@@ -364,24 +338,19 @@ export default function App() {
           />
         </div>
 
-        {/* Floating Hex Navigator - Top Right */}
+        {/* Right Panel - Hex Navigator and Output */}
         {showHexNav && (
           <div
             style={{
-              position: "fixed",
-              top: 60,
-              right: 20,
-              width: hexNavSize.width,
-              height: hexNavSize.height,
+              width: rightPanelWidth,
               background: "#111318",
-              border: "1px solid #2a2f3d",
-              borderRadius: "8px",
+              borderLeft: "1px solid #1f2330",
               display: "flex",
               flexDirection: "column",
-              zIndex: 100,
-              boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
             }}
+            onMouseDown={handlePanelMouseDown}
           >
+            {/* Hex Navigator */}
             <div
               style={{
                 padding: "8px 10px",
@@ -392,10 +361,8 @@ export default function App() {
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
-                cursor: "move",
                 userSelect: "none",
               }}
-              data-hex-header
             >
               <span>FILES MAP</span>
               <button
@@ -414,7 +381,7 @@ export default function App() {
             </div>
             <div
               style={{
-                flex: 1,
+                height: hexNavHeight,
                 overflow: "hidden",
                 position: "relative",
               }}
@@ -430,80 +397,65 @@ export default function App() {
                 }}
               />
             </div>
-          </div>
-        )}
 
-        {/* Floating Output Panel */}
-        {showOutput && (
-          <div
-            onMouseDown={handleOutputMouseDown}
-            style={{
-              position: "fixed",
-              top: outputPosition.top,
-              left: outputPosition.left,
-              width: 500,
-              height: outputHeight,
-              background: "#111318",
-              border: "1px solid #2a2f3d",
-              borderRadius: "8px",
-              display: "flex",
-              flexDirection: "column",
-              zIndex: 200,
-              boxShadow: "0 4px 12px rgba(0,0,0,0.5)",
-            }}
-          >
-            {/* Header - Draggable */}
-            <div
-              data-output-header
-              style={{
-                padding: "8px 10px",
-                fontSize: 11,
-                color: "#8b93a7",
-                borderBottom: "1px solid #1f2330",
-                fontWeight: "bold",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                cursor: "move",
-                userSelect: "none",
-                background: isDraggingOutput ? "#1a1d27" : "#111318",
-              }}
-            >
-              <span>OUTPUT</span>
-              <button
-                onClick={() => setShowOutput(false)}
+            {/* Divider */}
+            {showOutput && (
+              <div
+                data-divider
                 style={{
-                  background: "transparent",
-                  border: "none",
-                  color: "#8b93a7",
-                  cursor: "pointer",
-                  fontSize: 14,
-                  padding: "0 4px",
+                  height: 4,
+                  background: isResizingPanel ? "#48bb78" : "#1f2330",
+                  cursor: "ns-resize",
+                  transition: isResizingPanel ? "none" : "background 0.2s",
+                }}
+                title="Drag to resize"
+              />
+            )}
+
+            {/* Output Panel */}
+            {showOutput && (
+              <div
+                style={{
+                  flex: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                  overflow: "hidden",
                 }}
               >
-                ×
-              </button>
-            </div>
+                <div
+                  style={{
+                    padding: "8px 10px",
+                    fontSize: 11,
+                    color: "#8b93a7",
+                    borderBottom: "1px solid #1f2330",
+                    fontWeight: "bold",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    userSelect: "none",
+                  }}
+                >
+                  <span>OUTPUT</span>
+                  <button
+                    onClick={() => setShowOutput(false)}
+                    style={{
+                      background: "transparent",
+                      border: "none",
+                      color: "#8b93a7",
+                      cursor: "pointer",
+                      fontSize: 14,
+                      padding: "0 4px",
+                    }}
+                  >
+                    ×
+                  </button>
+                </div>
 
-            {/* Content */}
-            <div style={{ flex: 1, overflow: "hidden" }}>
-              <Output ref={outputRef} editorRef={editorRef} language={currentDocument?.language} />
-            </div>
-
-            {/* Resize Handle - Bottom Right */}
-            <div
-              data-output-resize
-              style={{
-                position: "absolute",
-                bottom: 0,
-                right: 0,
-                width: 20,
-                height: 20,
-                cursor: "nwse-resize",
-                background: isResizingOutput ? "rgba(72, 187, 120, 0.3)" : "transparent",
-              }}
-              title="Drag to resize"
-            />
+                <div style={{ flex: 1, overflow: "hidden" }}>
+                  <Output ref={outputRef} editorRef={editorRef} language={currentDocument?.language} />
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
