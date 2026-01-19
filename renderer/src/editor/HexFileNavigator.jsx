@@ -149,10 +149,10 @@ export default function HexFileNavigator({ documents, currentDocumentId, onSelec
             style={{
               width: '100%',
               height: '100%',
-              backgroundColor: isActive ? color : '#2a2d35',
+              backgroundColor: isActive ? color : '#f1ebef',
               clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)',
-              border: isActive ? `3px solid ${color}` : '2px solid #3a3d45',
-              boxShadow: isActive ? `0 0 20px ${color}40` : '0 4px 8px rgba(0,0,0,0.3)',
+              border: isActive ? `3px solid ${color}` : '1px solid #e2d8e0',
+              boxShadow: isActive ? `0 4px 12px ${color}30` : '0 2px 4px rgba(46, 42, 47, 0.08)',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
@@ -164,7 +164,7 @@ export default function HexFileNavigator({ documents, currentDocumentId, onSelec
             {/* File name - always visible */}
             <div
               style={{
-                color: isActive ? '#000' : '#fff',
+                color: isActive ? '#fff' : '#2e2a2f',
                 fontSize: '9px',
                 fontWeight: 'bold',
                 textAlign: 'center',
@@ -187,7 +187,7 @@ export default function HexFileNavigator({ documents, currentDocumentId, onSelec
                 textAlign: 'center',
                 backgroundColor: isActive ? color : 'transparent',
                 padding: '2px 4px',
-                borderRadius: '2px',
+                borderRadius: '3px',
               }}
             >
               .{doc.title.split('.').pop()}
@@ -208,7 +208,7 @@ export default function HexFileNavigator({ documents, currentDocumentId, onSelec
                 width: 20,
                 height: 20,
                 borderRadius: '50%',
-                backgroundColor: '#ff4444',
+                backgroundColor: '#d6a0a0',
                 color: '#fff',
                 border: 'none',
                 cursor: 'pointer',
@@ -217,7 +217,10 @@ export default function HexFileNavigator({ documents, currentDocumentId, onSelec
                 alignItems: 'center',
                 justifyContent: 'center',
                 zIndex: 10,
+                transition: 'all 120ms ease-out',
               }}
+              onMouseEnter={(e) => e.target.style.backgroundColor = '#c68a8a'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = '#d6a0a0'}
             >
               ×
             </button>
@@ -233,13 +236,14 @@ export default function HexFileNavigator({ documents, currentDocumentId, onSelec
               left: '50%',
               transform: 'translateX(-50%)',
               fontSize: 8,
-              color: '#48bb78',
-              backgroundColor: '#1a1d27',
+              color: '#c89fb6',
+              backgroundColor: '#fbf8fa',
               padding: '2px 4px',
-              borderRadius: 2,
-              border: '1px solid #48bb78',
+              borderRadius: 4,
+              border: '1px solid #c89fb6',
               whiteSpace: 'nowrap',
               pointerEvents: 'none',
+              fontWeight: 600,
             }}
           >
             {dependencies[doc.id].imports.length > 0 && `→${dependencies[doc.id].imports.length}`}
@@ -257,16 +261,16 @@ export default function HexFileNavigator({ documents, currentDocumentId, onSelec
               left: '50%',
               transform: 'translateX(-50%)',
               marginTop: 12,
-              padding: '4px 8px',
-              backgroundColor: '#1e1e1e',
-              border: '1px solid #3a3d45',
-              borderRadius: 4,
+              padding: '6px 10px',
+              backgroundColor: '#f6f2f4',
+              border: '1px solid #e2d8e0',
+              borderRadius: 6,
               fontSize: 11,
-              color: '#ccc',
+              color: '#2e2a2f',
               whiteSpace: 'nowrap',
               pointerEvents: 'none',
               opacity: hoveredId === doc.id ? 1 : 0,
-              transition: 'opacity 0.2s',
+              transition: 'opacity 120ms ease-out',
               zIndex: 100,
             }}
           >
@@ -286,7 +290,7 @@ export default function HexFileNavigator({ documents, currentDocumentId, onSelec
         width: '100%',
         height: '100%',
         position: 'relative',
-        backgroundColor: '#0E0F13',
+        backgroundColor: '#fbf8fa',
         overflow: 'hidden',
         cursor: isDragging ? 'grabbing' : 'grab',
         userSelect: 'none',
@@ -298,20 +302,20 @@ export default function HexFileNavigator({ documents, currentDocumentId, onSelec
           position: 'absolute',
           top: 10,
           left: 10,
-          fontSize: 10,
-          color: '#888',
+          fontSize: 11,
+          color: '#8c8791',
           pointerEvents: 'none',
           zIndex: 100,
-          backgroundColor: '#1a1d27',
-          padding: '6px 10px',
-          borderRadius: 4,
-          border: '1px solid #2a2f3d',
+          backgroundColor: '#f6f2f4',
+          padding: '8px 12px',
+          borderRadius: 8,
+          border: '1px solid #e2d8e0',
         }}
       >
         <div>🖱️ Drag to pan • 🔍 Scroll to zoom</div>
-        <div style={{ fontSize: 9, color: '#666', marginTop: 2 }}>
-          <span style={{ color: '#48bb78' }}>━━</span> Direct import • 
-          <span style={{ color: '#666' }}> ┄┄</span> Reference
+        <div style={{ fontSize: 10, color: '#b8a0b6', marginTop: 3 }}>
+          <span style={{ color: '#c89fb6' }}>━━</span> Direct import • 
+          <span style={{ color: '#d0c5d6' }}> ┄┄</span> Reference
         </div>
       </div>
 
@@ -321,12 +325,12 @@ export default function HexFileNavigator({ documents, currentDocumentId, onSelec
           position: 'absolute',
           top: 10,
           right: 10,
-          fontSize: 11,
-          color: '#888',
-          backgroundColor: '#1a1d27',
-          padding: '4px 8px',
-          borderRadius: 4,
-          border: '1px solid #2a2f3d',
+          fontSize: 12,
+          color: '#8c8791',
+          backgroundColor: '#f6f2f4',
+          padding: '6px 10px',
+          borderRadius: 8,
+          border: '1px solid #e2d8e0',
           pointerEvents: 'none',
         }}
       >

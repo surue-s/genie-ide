@@ -173,33 +173,40 @@ export default function App() {
         display: "flex",
         flexDirection: "column",
         height: "100vh",
-        background: "#0E0F13",
-        color: "#ccc"
+        background: "#f6f2f4",
+        color: "#2e2a2f",
+        fontFamily: "'Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', sans-serif",
       }}
     >
       {/* Header with controls */}
       <div
         style={{
-          padding: "12px",
-          borderBottom: "1px solid #1f2330",
+          padding: "16px 20px",
+          borderBottom: "1px solid #e8dfe6",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
           gap: 12,
+          background: "#fbf8fa",
         }}
       >
-        <div style={{ display: "flex", gap: 8 }}>
+        <div style={{ display: "flex", gap: 10 }}>
           <button
             onClick={handleNewFile}
             style={{
-              background: "#1a1d27",
-              border: "1px solid #2a2f3d",
-              color: "#ccc",
-              padding: "6px 12px",
+              background: "#f1ebef",
+              border: "1px solid #e2d8e0",
+              color: "#2e2a2f",
+              padding: "8px 14px",
               cursor: "pointer",
-              borderRadius: "4px",
-              fontSize: 12,
+              borderRadius: "8px",
+              fontSize: 13,
+              fontWeight: 500,
+              transition: "all 120ms ease-out",
+              hover: { background: "#ede7eb" },
             }}
+            onMouseEnter={(e) => e.target.style.background = "#ede7eb"}
+            onMouseLeave={(e) => e.target.style.background = "#f1ebef"}
           >
             + New File
           </button>
@@ -208,23 +215,27 @@ export default function App() {
             onClick={() => setRenamingDoc(currentDocument)}
             disabled={!currentDocument}
             style={{
-              background: "#1a1d27",
-              border: "1px solid #2a2f3d",
-              color: "#ccc",
-              padding: "6px 12px",
+              background: "#f1ebef",
+              border: "1px solid #e2d8e0",
+              color: currentDocument ? "#2e2a2f" : "#c0b8c5",
+              padding: "8px 14px",
               cursor: currentDocument ? "pointer" : "not-allowed",
-              borderRadius: "4px",
-              opacity: currentDocument ? 1 : 0.5,
-              fontSize: 12,
+              borderRadius: "8px",
+              opacity: currentDocument ? 1 : 0.6,
+              fontSize: 13,
+              fontWeight: 500,
+              transition: "all 120ms ease-out",
             }}
+            onMouseEnter={(e) => currentDocument && (e.target.style.background = "#ede7eb")}
+            onMouseLeave={(e) => e.target.style.background = "#f1ebef"}
           >
             ✏️ Rename
           </button>
         </div>
 
-        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
           {currentDocument && (
-            <div style={{ fontSize: 11, color: "#888" }}>
+            <div style={{ fontSize: 12, color: "#5f5a63", fontWeight: 500 }}>
               {currentDocument.title}
             </div>
           )}
@@ -233,13 +244,18 @@ export default function App() {
             value={currentDocument?.language}
             onChange={handleLanguageChange}
             style={{
-              background: "#1a1d27",
-              color: "#ccc",
-              border: "1px solid #2a2f3d",
-              padding: "6px 8px",
-              borderRadius: "4px",
+              background: "#f1ebef",
+              color: "#2e2a2f",
+              border: "1px solid #e2d8e0",
+              padding: "8px 12px",
+              borderRadius: "8px",
               fontSize: 12,
+              fontWeight: 500,
+              cursor: "pointer",
+              transition: "all 120ms ease-out",
             }}
+            onMouseEnter={(e) => e.target.style.background = "#ede7eb"}
+            onMouseLeave={(e) => e.target.style.background = "#f1ebef"}
           >
             {Object.keys(LANGUAGE_VERSIONS).map(lang => (
               <option key={lang} value={lang}>
@@ -251,46 +267,64 @@ export default function App() {
           <button
             onClick={() => setShowHexNav(!showHexNav)}
             style={{
-              background: showHexNav ? "#48bb78" : "#1a1d27",
-              border: "1px solid #2a2f3d",
-              color: showHexNav ? "#000" : "#fff",
-              padding: "6px 12px",
+              background: showHexNav ? "#c89fb6" : "#f1ebef",
+              border: "1px solid" + (showHexNav ? "#b88aa5" : "#e2d8e0"),
+              color: showHexNav ? "#fff" : "#2e2a2f",
+              padding: "8px 14px",
               cursor: "pointer",
-              borderRadius: "4px",
-              fontWeight: showHexNav ? "bold" : "normal",
-              fontSize: 12,
+              borderRadius: "8px",
+              fontWeight: showHexNav ? 600 : 500,
+              fontSize: 13,
+              transition: "all 120ms ease-out",
+            }}
+            onMouseEnter={(e) => {
+              if (!showHexNav) e.target.style.background = "#ede7eb";
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.background = showHexNav ? "#c89fb6" : "#f1ebef";
             }}
           >
-            {showHexNav ? "📊 Graph" : "📝 Hide"}
+            📊 Graph
           </button>
 
           <button
             onClick={() => setShowOutput(!showOutput)}
             style={{
-              background: showOutput ? "#4299e1" : "#1a1d27",
-              border: "1px solid #2a2f3d",
-              color: showOutput ? "#fff" : "#ccc",
-              padding: "6px 12px",
+              background: showOutput ? "#b8a4c9" : "#f1ebef",
+              border: "1px solid" + (showOutput ? "#a593b8" : "#e2d8e0"),
+              color: showOutput ? "#fff" : "#2e2a2f",
+              padding: "8px 14px",
               cursor: "pointer",
-              borderRadius: "4px",
-              fontWeight: showOutput ? "bold" : "normal",
-              fontSize: 12,
+              borderRadius: "8px",
+              fontWeight: showOutput ? 600 : 500,
+              fontSize: 13,
+              transition: "all 120ms ease-out",
+            }}
+            onMouseEnter={(e) => {
+              if (!showOutput) e.target.style.background = "#ede7eb";
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.background = showOutput ? "#b8a4c9" : "#f1ebef";
             }}
           >
-            {showOutput ? "▼ Output" : "▲ Output"}
+            ▼ Output
           </button>
 
           <button
             onClick={() => setShowShortcuts(true)}
             style={{
-              background: "#1a1d27",
-              border: "1px solid #2a2f3d",
-              color: "#ccc",
-              padding: "6px 12px",
+              background: "#f1ebef",
+              border: "1px solid #e2d8e0",
+              color: "#2e2a2f",
+              padding: "8px 14px",
               cursor: "pointer",
-              borderRadius: "4px",
-              fontSize: 12,
+              borderRadius: "8px",
+              fontSize: 13,
+              fontWeight: 500,
+              transition: "all 120ms ease-out",
             }}
+            onMouseEnter={(e) => e.target.style.background = "#ede7eb"}
+            onMouseLeave={(e) => e.target.style.background = "#f1ebef"}
             title="Show keyboard shortcuts"
           >
             ❓
@@ -302,9 +336,9 @@ export default function App() {
         {/* Left Panel - Folder Manager */}
         <div
           style={{
-            width: 220,
-            background: "#111318",
-            borderRight: "1px solid #1f2330",
+            width: 240,
+            background: "#fbf8fa",
+            borderRight: "1px solid #e8dfe6",
             display: "flex",
             flexDirection: "column",
           }}
@@ -328,7 +362,7 @@ export default function App() {
             display: "flex",
             flexDirection: "column",
             minWidth: 0,
-            background: "#0E0F13",
+            background: "#f6f2f4",
           }}
         >
           <CodeEditor
@@ -343,8 +377,8 @@ export default function App() {
           <div
             style={{
               width: rightPanelWidth,
-              background: "#111318",
-              borderLeft: "1px solid #1f2330",
+              background: "#fbf8fa",
+              borderLeft: "1px solid #e8dfe6",
               display: "flex",
               flexDirection: "column",
             }}
@@ -353,28 +387,33 @@ export default function App() {
             {/* Hex Navigator */}
             <div
               style={{
-                padding: "8px 10px",
-                fontSize: 11,
-                color: "#8b93a7",
-                borderBottom: "1px solid #1f2330",
-                fontWeight: "bold",
+                padding: "12px 16px",
+                fontSize: 12,
+                color: "#5f5a63",
+                borderBottom: "1px solid #e8dfe6",
+                fontWeight: 600,
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
                 userSelect: "none",
+                letterSpacing: "0.5px",
+                textTransform: "uppercase",
               }}
             >
-              <span>FILES MAP</span>
+              <span>Files Map</span>
               <button
                 onClick={() => setShowHexNav(false)}
                 style={{
                   background: "transparent",
                   border: "none",
-                  color: "#8b93a7",
+                  color: "#8c8791",
                   cursor: "pointer",
-                  fontSize: 14,
+                  fontSize: 18,
                   padding: "0 4px",
+                  transition: "color 120ms ease-out",
                 }}
+                onMouseEnter={(e) => e.target.style.color = "#2e2a2f"}
+                onMouseLeave={(e) => e.target.style.color = "#8c8791"}
               >
                 ×
               </button>
@@ -403,10 +442,10 @@ export default function App() {
               <div
                 data-divider
                 style={{
-                  height: 4,
-                  background: isResizingPanel ? "#48bb78" : "#1f2330",
+                  height: 1,
+                  background: isResizingPanel ? "#c89fb6" : "#e2d8e0",
                   cursor: "ns-resize",
-                  transition: isResizingPanel ? "none" : "background 0.2s",
+                  transition: isResizingPanel ? "none" : "background 120ms ease-out",
                 }}
                 title="Drag to resize"
               />
@@ -424,28 +463,33 @@ export default function App() {
               >
                 <div
                   style={{
-                    padding: "8px 10px",
-                    fontSize: 11,
-                    color: "#8b93a7",
-                    borderBottom: "1px solid #1f2330",
-                    fontWeight: "bold",
+                    padding: "12px 16px",
+                    fontSize: 12,
+                    color: "#5f5a63",
+                    borderBottom: "1px solid #e8dfe6",
+                    fontWeight: 600,
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
                     userSelect: "none",
+                    letterSpacing: "0.5px",
+                    textTransform: "uppercase",
                   }}
                 >
-                  <span>OUTPUT</span>
+                  <span>Output</span>
                   <button
                     onClick={() => setShowOutput(false)}
                     style={{
                       background: "transparent",
                       border: "none",
-                      color: "#8b93a7",
+                      color: "#8c8791",
                       cursor: "pointer",
-                      fontSize: 14,
+                      fontSize: 18,
                       padding: "0 4px",
+                      transition: "color 120ms ease-out",
                     }}
+                    onMouseEnter={(e) => e.target.style.color = "#2e2a2f"}
+                    onMouseLeave={(e) => e.target.style.color = "#8c8791"}
                   >
                     ×
                   </button>
