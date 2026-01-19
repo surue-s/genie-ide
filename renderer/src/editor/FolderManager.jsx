@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { getFileColor } from "../core/fileExtensions";
 
-export default function FolderManager({ documents, currentDocumentId, onSelect, onClose, onRename }) {
+export default function FolderManager({ documents, currentDocumentId, onSelect, onClose, onRename, theme }) {
   const [expandedFolders, setExpandedFolders] = useState(new Set());
+  
+  const colors = theme.colors;
+  const isDark = theme.type === 'dark';
 
   // Group files by folder
   const groupFilesByFolder = () => {
@@ -42,6 +45,7 @@ export default function FolderManager({ documents, currentDocumentId, onSelect, 
   const FileItem = ({ doc, level = 0 }) => {
     const color = getFileColor(doc.title);
     const fileName = doc.title.includes('/') ? doc.title.split('/').pop() : doc.title;
+    const isActive = doc.id === currentDocumentId;
     
     return (
       <div
@@ -51,29 +55,36 @@ export default function FolderManager({ documents, currentDocumentId, onSelect, 
           paddingLeft: `${12 + level * 16}px`,
           padding: '8px 10px',
           marginBottom: 4,
-          backgroundColor: doc.id === currentDocumentId ? '#c89fb6' : 'transparent',
-          color: doc.id === currentDocumentId ? '#fff' : '#2e2a2f',
+          backgroundColor: isActive ? colors.chipSelectedBg : 'transparent',
+          border: `1px solid ${isActive ? colors.chipSelectedBorder : 'transparent'}`,
+          color: isActive ? colors.accentRose : colors.textPrimary,
           cursor: 'pointer',
-          borderRadius: 8,
+          borderRadius: 10,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          transition: 'background-color 0.15s ease-out,color 0.15s ease-out',
+          transition: 'all 140ms ease-out',
         }}
         onMouseEnter={(e) => {
-          if (doc.id !== currentDocumentId) {
-            e.currentTarget.style.backgroundColor = '#f1ebef';
+          if (!isActive) {
+            e.currentTarget.style.backgroundColor = colors.buttonBgHover;
           }
         }}
         onMouseLeave={(e) => {
-          if (doc.id !== currentDocumentId) {
+          if (!isActive) {
             e.currentTarget.style.backgroundColor = 'transparent';
           }
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, flex: 1 }}>
           <span style={{ fontSize: 10, color: color }}>◆</span>
-          <span style={{ fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: '#2e2a2f' }}>
+          <span style={{ 
+            fontSize: 12, 
+            overflow: 'hidden', 
+            textOverflow: 'ellipsis', 
+            whiteSpace: 'nowrap',
+            color: 'inherit'
+          }}>
             {fileName}
           </span>
         </div>
@@ -87,15 +98,15 @@ export default function FolderManager({ documents, currentDocumentId, onSelect, 
           style={{
             background: 'transparent',
             border: 'none',
-            color: '#8c8791',
+            color: colors.textMuted,
             cursor: documents.length > 1 ? 'pointer' : 'not-allowed',
             fontSize: 12,
             padding: '2px 6px',
             opacity: documents.length > 1 ? 0.9 : 0.4,
-            transition: 'color 0.12s ease-out',
+            transition: 'color 140ms ease-out',
           }}
-          onMouseEnter={(e) => documents.length > 1 && (e.currentTarget.style.color = '#2e2a2f')}
-          onMouseLeave={(e) => e.currentTarget.style.color = '#8c8791'}
+          onMouseEnter={(e) => documents.length > 1 && (e.currentTarget.style.color = colors.textPrimary)}
+          onMouseLeave={(e) => e.currentTarget.style.color = colors.textMuted}
         >
           ×
         </button>
@@ -119,26 +130,26 @@ export default function FolderManager({ documents, currentDocumentId, onSelect, 
             display: 'flex',
             alignItems: 'center',
             gap: 8,
-            color: '#5f5a63',
+            color: colors.textSecondary,
             fontSize: 12,
             userSelect: 'none',
-            transition: 'background-color 0.15s ease-out',
-            borderRadius: 8,
+            transition: 'background-color 140ms ease-out',
+            borderRadius: 10,
             marginBottom: 4,
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = '#f1ebef';
+            e.currentTarget.style.backgroundColor = colors.buttonBgHover;
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.backgroundColor = 'transparent';
           }}
         >
-          <span style={{ fontSize: 11, minWidth: 12, color: '#8c8791' }}>
+          <span style={{ fontSize: 11, minWidth: 12, color: colors.textMuted }}>
             {isExpanded ? '▾' : '▸'}
           </span>
-          <span style={{ fontSize: 11, color: '#5f5a63' }}>▢</span>
+          <span style={{ fontSize: 11, color: colors.textSecondary }}>▢</span>
           <span style={{ fontWeight: 600 }}>{folderName}</span>
-          <span style={{ fontSize: 11, color: '#8c8791', marginLeft: 'auto' }}>
+          <span style={{ fontSize: 11, color: colors.textMuted, marginLeft: 'auto' }}>
             {fileCount}
           </span>
         </div>
@@ -153,28 +164,14 @@ export default function FolderManager({ documents, currentDocumentId, onSelect, 
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        backgroundColor: '#fbf8fa',
+        backgroundColor: colors.bgPanel,
       }}
     >
       <div
         style={{
-          padding: '12px 14px',
-          borderBottom: '1px solid #e8dfe6',
-          fontSize: 12,
-          color: '#5f5a63',
-          fontWeight: 700,
-          letterSpacing: '0.5px',
-          textTransform: 'uppercase',
-        }}
-      >
-        EXPLORER
-      </div>
-
-      <div
-        style={{
           flex: 1,
           overflowY: 'auto',
-          padding: '10px 0',
+          padding: '10px 12px',
         }}
       >
         {/* Root files */}
@@ -200,7 +197,7 @@ export default function FolderManager({ documents, currentDocumentId, onSelect, 
           <div
             style={{
               padding: '12px',
-              color: '#666',
+              color: colors.textMuted,
               fontSize: 12,
               textAlign: 'center',
             }}

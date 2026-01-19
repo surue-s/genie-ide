@@ -3,7 +3,7 @@ import { getFileColor } from "../core/fileExtensions";
 import { analyzeFileDependencies, getDependencyStrength, getDependencyColor } from "../core/dependencyAnalyzer";
 
 // Hexagonal file navigator inspired by Apple Watch with dependency visualization
-export default function HexFileNavigator({ documents, currentDocumentId, onSelect, onClose, onRename }) {
+export default function HexFileNavigator({ documents, currentDocumentId, onSelect, onClose, onRename, theme }) {
   const dependencies = analyzeFileDependencies(documents);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
@@ -11,6 +11,8 @@ export default function HexFileNavigator({ documents, currentDocumentId, onSelec
   const [scale, setScale] = useState(1);
   const [hoveredId, setHoveredId] = useState(null);
   const containerRef = useRef(null);
+  
+  const colors = theme.colors;
 
   // Calculate hexagon positions in a honeycomb pattern
   const getHexPosition = (index, total) => {
@@ -213,7 +215,7 @@ export default function HexFileNavigator({ documents, currentDocumentId, onSelec
                 width: 20,
                 height: 20,
                 borderRadius: '50%',
-                backgroundColor: '#d6a0a0',
+                backgroundColor: colors.error,
                 color: '#fff',
                 border: 'none',
                 cursor: 'pointer',
@@ -222,10 +224,10 @@ export default function HexFileNavigator({ documents, currentDocumentId, onSelec
                 alignItems: 'center',
                 justifyContent: 'center',
                 zIndex: 10,
-                transition: 'all 120ms ease-out',
+                transition: 'all 140ms ease-out',
               }}
-              onMouseEnter={(e) => e.target.style.backgroundColor = '#c68a8a'}
-              onMouseLeave={(e) => e.target.style.backgroundColor = '#d6a0a0'}
+              onMouseEnter={(e) => e.target.style.transform = 'scale(1.1)'}
+              onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
             >
               ×
             </button>
@@ -241,11 +243,11 @@ export default function HexFileNavigator({ documents, currentDocumentId, onSelec
               left: '50%',
               transform: 'translateX(-50%)',
               fontSize: 8,
-              color: '#c89fb6',
-              backgroundColor: '#fbf8fa',
+              color: colors.accentMint,
+              backgroundColor: colors.surfaceRaised,
               padding: '2px 4px',
               borderRadius: 4,
-              border: '1px solid #c89fb6',
+              border: `1px solid ${colors.accentMint}`,
               whiteSpace: 'nowrap',
               pointerEvents: 'none',
               fontWeight: 600,
@@ -267,16 +269,17 @@ export default function HexFileNavigator({ documents, currentDocumentId, onSelec
               transform: 'translateX(-50%)',
               marginTop: 12,
               padding: '6px 10px',
-              backgroundColor: '#f6f2f4',
-              border: '1px solid #e2d8e0',
-              borderRadius: 6,
+              backgroundColor: colors.surfaceRaised,
+              border: `1px solid ${colors.borderSubtle}`,
+              borderRadius: 10,
               fontSize: 11,
-              color: '#2e2a2f',
+              color: colors.textPrimary,
               whiteSpace: 'nowrap',
               pointerEvents: 'none',
               opacity: hoveredId === doc.id ? 1 : 0,
-              transition: 'opacity 120ms ease-out',
+              transition: 'opacity 140ms ease-out',
               zIndex: 100,
+              boxShadow: `0 2px 8px ${colors.shadow}`,
             }}
           >
             {doc.title}
@@ -295,7 +298,7 @@ export default function HexFileNavigator({ documents, currentDocumentId, onSelec
         width: '100%',
         height: '100%',
         position: 'relative',
-        backgroundColor: '#fbf8fa',
+        backgroundColor: colors.bgPanelAlt,
         overflow: 'hidden',
         cursor: isDragging ? 'grabbing' : 'grab',
         userSelect: 'none',
@@ -308,19 +311,20 @@ export default function HexFileNavigator({ documents, currentDocumentId, onSelec
           top: 10,
           left: 10,
           fontSize: 11,
-          color: '#8c8791',
+          color: colors.textMuted,
           pointerEvents: 'none',
           zIndex: 100,
-          backgroundColor: '#f6f2f4',
+          backgroundColor: colors.surfaceRaised,
           padding: '8px 12px',
-          borderRadius: 8,
-          border: '1px solid #e2d8e0',
+          borderRadius: 10,
+          border: `1px solid ${colors.borderSubtle}`,
+          boxShadow: `0 2px 8px ${colors.shadow}`,
         }}
       >
         <div>Drag to pan • Scroll to zoom</div>
-        <div style={{ fontSize: 10, color: '#b8a0b6', marginTop: 3 }}>
-          <span style={{ color: '#c89fb6' }}>━━</span> Direct import • 
-          <span style={{ color: '#d0c5d6' }}> ┄┄</span> Reference
+        <div style={{ fontSize: 10, color: colors.textMuted, marginTop: 3 }}>
+          <span style={{ color: colors.accentMint }}>━━</span> Direct import • 
+          <span style={{ color: colors.borderSubtle }}> ┄┄</span> Reference
         </div>
       </div>
 
@@ -331,12 +335,13 @@ export default function HexFileNavigator({ documents, currentDocumentId, onSelec
           top: 10,
           right: 10,
           fontSize: 12,
-          color: '#8c8791',
-          backgroundColor: '#f6f2f4',
+          color: colors.textSecondary,
+          backgroundColor: colors.surfaceRaised,
           padding: '6px 10px',
-          borderRadius: 8,
-          border: '1px solid #e2d8e0',
+          borderRadius: 10,
+          border: `1px solid ${colors.borderSubtle}`,
           pointerEvents: 'none',
+          boxShadow: `0 2px 8px ${colors.shadow}`,
         }}
       >
         {documents.length} file{documents.length !== 1 ? 's' : ''}
