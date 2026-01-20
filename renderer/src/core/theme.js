@@ -116,62 +116,62 @@ export const themes = {
   },
   'soft-purple-pink': {
     name: 'Soft Purple-Pink',
-    type: 'dark',
+    type: 'light',  // Changed from 'dark' to 'light' since we made it brighter
     colors: {
-      // Base backgrounds
-      bgApp: '#140F1F',
-      bgPanel: '#1C152B',
-      bgPanelAlt: '#221A35',
-      surfaceRaised: '#261E3D',
+      // Base backgrounds - making them lighter
+      bgApp: '#F5F3FA',
+      bgPanel: '#F9F7FD',
+      bgPanelAlt: '#F0ECF7',
+      surfaceRaised: '#E8E2F2',
       
-      // Borders
-      borderSubtle: '#3A2D55',
+      // Borders - adjusting to match lighter theme
+      borderSubtle: '#D6C9E9',
       borderFocus: '#C7A8FF',
       
-      // Text
-      textPrimary: '#F3E9FF',
-      textSecondary: '#D6C9F0',
-      textMuted: '#A894C9',
+      // Text - improving readability with brighter colors
+      textPrimary: '#5D4A7E',
+      textSecondary: '#7A63A0',
+      textMuted: '#9C8FB4',
       
-      // Accents
+      // Accents - maintaining soft purple-pink aesthetic
       accentMint: '#E3A6D8',
       accentCyan: '#B99CFF',
       accentRose: '#F0C1E8',
       accentPeach: '#E3A6D8',
       
-      // Status
+      // Status - keeping the same soft colors
       warning: '#F0C1E8',
       error: '#FF9DB0',
       success: '#9EE5C0',
       
-      // Shadow
-      shadow: 'rgba(0,0,0,0.35)',
+      // Shadow - adjusting for lighter backgrounds
+      shadow: 'rgba(93,74,126,0.15)',
       
-      // UI States
-      buttonBg: '#261E3D',
-      buttonBgHover: '#322657',
-      buttonBgActive: '#3C2D66',
-      buttonText: '#140F1F',
-      chipSelectedBg: 'rgba(227,166,216,0.16)',
+      // UI States - making buttons more readable
+      buttonBg: '#E8E2F2',
+      buttonBgHover: '#D6C9E9',
+      buttonBgActive: '#C7B4E0',
+      buttonText: '#4A3A6D',  // Changed to be more readable against button backgrounds
+      chipSelectedBg: 'rgba(227,166,216,0.20)',
       chipSelectedBorder: '#E3A6D8',
-      focusRing: '0 0 0 3px rgba(199,168,255,0.35)',
+      focusRing: '0 0 0 3px rgba(199,168,255,0.30)',
     },
     editor: {
-      background: '#120D1B',
-      foreground: '#F3E9FF',
-      selectionBg: 'rgba(227, 166, 216, 0.25)',
-      lineHighlight: 'rgba(255,255,255,0.04)',
-      cursor: '#E3A6D8',
+      background: '#F8F6FD',
+      foreground: '#5D4A7E',
+      selectionBg: 'rgba(227, 166, 216, 0.30)',
+      lineHighlight: 'rgba(214,201,233,0.30)',
+      cursor: '#B99CFF',
       
-      // Token colors
-      comment: '#7E6A9C',
-      keyword: '#C6A6FF',
-      string: '#F1B6D1',
-      number: '#E6C8FF',
-      function: '#AFCBFF',
-      type: '#D8B4FF',
-      variable: '#F3E9FF',
-      punctuation: '#D6C9F0',
+      // Token colors - adjusted for better readability
+      comment: '#9C8FB4',
+      keyword: '#B99CFF',
+      string: '#E3A6D8',
+      number: '#9C7FD2',
+      function: '#7A63A0',
+      type: '#B99CFF',
+      variable: '#5D4A7E',
+      punctuation: '#7A63A0',
     }
   }
 };
