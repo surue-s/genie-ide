@@ -6,6 +6,7 @@ import FileRenameModal from "./editor/FileRenameModal";
 import ShortcutsHelp from "./editor/ShortcutsHelp";
 import ThemeControl from "./editor/ThemeControl";
 import PanelHeader from "./editor/PanelHeader";
+import MusicPlayerPanel from "./editor/MusicPlayerPanel";
 import { createDocument, changeLanguage } from "./core/document";
 import { LANGUAGE_VERSIONS } from "./core/constants";
 import { getExtensionForLanguage } from "./core/fileExtensions";
@@ -21,6 +22,7 @@ export default function App() {
   const [showHexNav, setShowHexNav] = useState(true);
   const [renamingDoc, setRenamingDoc] = useState(null);
   const [showShortcuts, setShowShortcuts] = useState(false);
+  const [showMusicPlayer, setShowMusicPlayer] = useState(false);
   const [showOutput, setShowOutput] = useState(true);
   const [hexNavHeight, setHexNavHeight] = useState(300); // pixels
   const [outputHeight, setOutputHeight] = useState(250); // pixels
@@ -134,7 +136,7 @@ export default function App() {
 
   useEffect(() => {
     const handleKey = (e) => {
-      if (e.key === '?' && !e.ctrlKey && !e.metaKey) {
+      if (e.altKey === '/') {
         setShowShortcuts(true);
       } else {
         handleKeyDown(e);
@@ -392,6 +394,44 @@ export default function App() {
           >
             Shortcuts
           </button>
+
+          <button
+            onClick={() => setShowMusicPlayer(!showMusicPlayer)}
+            data-music-button
+            style={{
+              background: showMusicPlayer ? colors.accentMint : colors.buttonBg,
+              border: `1px solid ${showMusicPlayer ? colors.accentMint : colors.borderSubtle}`,
+              color: showMusicPlayer ? '#000' : colors.buttonText,
+              padding: "8px 14px",
+              cursor: "pointer",
+              borderRadius: "10px",
+              fontSize: 13,
+              fontWeight: showMusicPlayer ? 600 : 500,
+              transition: "all 140ms ease-out",
+              height: 36,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+            }}
+            onMouseEnter={(e) => {
+              if (!showMusicPlayer) {
+                e.currentTarget.style.background = colors.buttonBgHover;
+              }
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = showMusicPlayer ? colors.accentMint : colors.buttonBg;
+            }}
+            onFocus={(e) => e.currentTarget.style.boxShadow = colors.focusRing}
+            onBlur={(e) => e.currentTarget.style.boxShadow = 'none'}
+            title="Open ambient music player"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 18V5l12-2v13"/>
+              <circle cx="6" cy="18" r="3"/>
+              <circle cx="18" cy="16" r="3"/>
+            </svg>
+            Music
+          </button>
         </div>
       </div>
       <div style={{ display: "flex", flex: 1, overflow: "hidden", position: "relative" }}>
@@ -619,6 +659,13 @@ export default function App() {
       {showShortcuts && (
         <ShortcutsHelp onClose={() => setShowShortcuts(false)} theme={theme} />
       )}
+
+      {/* Music Player Panel */}
+      <MusicPlayerPanel 
+        isOpen={showMusicPlayer}
+        onClose={() => setShowMusicPlayer(false)}
+        theme={theme}
+      />
     </div>
   );
 }
