@@ -113,6 +113,66 @@ export const themes = {
       variable: '#2B1F3A',
       punctuation: '#5A4F6B',
     }
+  },
+  'soft-purple-pink': {
+    name: 'Soft Purple-Pink',
+    type: 'dark',
+    colors: {
+      // Base backgrounds
+      bgApp: '#140F1F',
+      bgPanel: '#1C152B',
+      bgPanelAlt: '#221A35',
+      surfaceRaised: '#261E3D',
+      
+      // Borders
+      borderSubtle: '#3A2D55',
+      borderFocus: '#C7A8FF',
+      
+      // Text
+      textPrimary: '#F3E9FF',
+      textSecondary: '#D6C9F0',
+      textMuted: '#A894C9',
+      
+      // Accents
+      accentMint: '#E3A6D8',
+      accentCyan: '#B99CFF',
+      accentRose: '#F0C1E8',
+      accentPeach: '#E3A6D8',
+      
+      // Status
+      warning: '#F0C1E8',
+      error: '#FF9DB0',
+      success: '#9EE5C0',
+      
+      // Shadow
+      shadow: 'rgba(0,0,0,0.35)',
+      
+      // UI States
+      buttonBg: '#261E3D',
+      buttonBgHover: '#322657',
+      buttonBgActive: '#3C2D66',
+      buttonText: '#140F1F',
+      chipSelectedBg: 'rgba(227,166,216,0.16)',
+      chipSelectedBorder: '#E3A6D8',
+      focusRing: '0 0 0 3px rgba(199,168,255,0.35)',
+    },
+    editor: {
+      background: '#120D1B',
+      foreground: '#F3E9FF',
+      selectionBg: 'rgba(227, 166, 216, 0.25)',
+      lineHighlight: 'rgba(255,255,255,0.04)',
+      cursor: '#E3A6D8',
+      
+      // Token colors
+      comment: '#7E6A9C',
+      keyword: '#C6A6FF',
+      string: '#F1B6D1',
+      number: '#E6C8FF',
+      function: '#AFCBFF',
+      type: '#D8B4FF',
+      variable: '#F3E9FF',
+      punctuation: '#D6C9F0',
+    }
   }
 };
 

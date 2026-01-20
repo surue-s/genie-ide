@@ -73,7 +73,16 @@ export default function CodeEditor({ document, onChange, editorRef, theme }) {
     prevThemeRef.current = themeKey;
 
     try {
-      const monacoTheme = theme.type === 'dark' ? 'genie-dark' : 'genie-light';
+      // Determine which Monaco theme to use based on the selected theme
+      let monacoTheme = 'genie-dark';
+      if (theme.name === 'Soft Light') {
+        monacoTheme = 'genie-light';
+      } else if (theme.name === 'Soft Purple-Pink') {
+        monacoTheme = 'genie-soft-purple-pink';
+      } else if (theme.type === 'light') {
+        monacoTheme = 'genie-light';
+      }
+      
       monacoRef.current.editor.setTheme(monacoTheme);
     } catch (error) {
       console.warn('Theme change failed:', error?.message);
@@ -85,7 +94,15 @@ export default function CodeEditor({ document, onChange, editorRef, theme }) {
       height="100%"
       language={monacoLanguage}
       value={document.text}
-      theme={theme.type === 'dark' ? 'genie-dark' : 'genie-light'}
+      theme={
+        theme.name === 'Soft Light' 
+          ? 'genie-light' 
+          : theme.name === 'Soft Purple-Pink'
+            ? 'genie-soft-purple-pink'
+            : theme.type === 'light' 
+              ? 'genie-light' 
+              : 'genie-dark'
+      }
       beforeMount={(monaco) => {
         // Ensure all language definitions are available before mount
         const langIds = ['python', 'java', 'c', 'cpp', 'go', 'rust', 'php'];
@@ -145,6 +162,54 @@ export default function CodeEditor({ document, onChange, editorRef, theme }) {
             'list.hoverBackground': '#2B2142',
             'list.activeSelectionBackground': '#2B2142',
             'list.inactiveSelectionBackground': '#241C38',
+          }
+        });
+
+        // Define Genie Soft Purple-Pink Theme
+        monaco.editor.defineTheme('genie-soft-purple-pink', {
+          base: 'vs-dark',
+          inherit: false,
+          rules: [
+            { token: '', foreground: 'F3E9FF' },
+            { token: 'comment', foreground: '7E6A9C', fontStyle: 'italic' },
+            { token: 'keyword', foreground: 'C6A6FF', fontStyle: 'bold' },
+            { token: 'string', foreground: 'F1B6D1' },
+            { token: 'number', foreground: 'E6C8FF' },
+            { token: 'function', foreground: 'AFCBFF' },
+            { token: 'variable', foreground: 'F3E9FF' },
+            { token: 'type', foreground: 'D8B4FF' },
+            { token: 'class', foreground: 'D8B4FF', fontStyle: 'bold' },
+            { token: 'operator', foreground: 'D6C9F0' },
+            { token: 'identifier', foreground: 'F3E9FF' },
+            { token: 'constant', foreground: 'E6C8FF' },
+            { token: 'parameter', foreground: 'F3E9FF' },
+            { token: 'tag', foreground: 'C6A6FF' },
+            { token: 'attribute', foreground: 'D8B4FF' },
+            { token: 'punctuation', foreground: 'D6C9F0' },
+          ],
+          colors: {
+            'editor.background': '#120D1B',
+            'editor.foreground': '#F3E9FF',
+            'editor.lineHighlightBackground': '#1C152B',
+            'editorLineNumber.foreground': '#7E6A9C',
+            'editorLineNumber.activeForeground': '#A894C9',
+            'editor.selectionBackground': '#E3A6D840',
+            'editor.inactiveSelectionBackground': '#E3A6D825',
+            'editorCursor.foreground': '#E3A6D8',
+            'editor.findMatchBackground': '#E3A6D840',
+            'editor.findMatchHighlightBackground': '#E3A6D825',
+            'editorIndentGuide.background': '#3A2D55',
+            'editorIndentGuide.activeBackground': '#B99CFF',
+            'editorWhitespace.foreground': '#3A2D55',
+            'editorWidget.background': '#1C152B',
+            'editorWidget.border': '#3A2D55',
+            'editorSuggestWidget.background': '#1C152B',
+            'editorSuggestWidget.foreground': '#F3E9FF',
+            'editorSuggestWidget.selectedBackground': '#261E3D',
+            'editorSuggestWidget.selectedBackground': '#261E3D',
+            'list.hoverBackground': '#261E3D',
+            'list.activeSelectionBackground': '#261E3D',
+            'list.inactiveSelectionBackground': '#221A35',
           }
         });
 
