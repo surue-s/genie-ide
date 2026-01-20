@@ -34,6 +34,7 @@ export default function App() {
   const [currentThemeKey, setCurrentThemeKey] = useState(() => {
     return localStorage.getItem('themeKey') || DEFAULT_THEME;
   });
+  const shouldShowRightPanel = showHexNav || showOutput;
 
   const currentDocument = documents.find(d => d.id === currentDocumentId);
   const theme = getTheme(currentThemeKey);
@@ -497,7 +498,7 @@ export default function App() {
         </div>
 
         {/* Right Panel - Hex Navigator and Output */}
-        {showHexNav && (
+        {shouldShowRightPanel && (
           <div
             style={{
               width: rightPanelWidth,
@@ -514,17 +515,17 @@ export default function App() {
               data-right-resize
               style={{
                 position: "absolute",
-                left: 0,
+                left: -4,
                 top: 0,
                 bottom: 0,
-                width: 4,
+                width: 12,
                 cursor: "ew-resize",
-                background: isResizingRightPanel ? colors.accentMint : "transparent",
+                background: isResizingRightPanel ? `${colors.accentMint}40` : "transparent",
                 transition: isResizingRightPanel ? "none" : "background 140ms ease-out",
-                zIndex: 10,
+                zIndex: 12,
               }}
               onMouseEnter={(e) => {
-                if (!isResizingRightPanel) e.currentTarget.style.background = colors.borderSubtle;
+                if (!isResizingRightPanel) e.currentTarget.style.background = `${colors.borderSubtle}60`;
               }}
               onMouseLeave={(e) => {
                 if (!isResizingRightPanel) e.currentTarget.style.background = "transparent";
@@ -532,67 +533,82 @@ export default function App() {
               title="Drag to resize panel"
             />
             {/* Hex Navigator */}
-            <PanelHeader
-              icon={
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-                </svg>
-              }
-              title="Files Map"
-              theme={theme}
-              actions={
-                <button
-                  onClick={() => setShowHexNav(false)}
+            {showHexNav && (
+              <>
+                <PanelHeader
+                  icon={
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                    </svg>
+                  }
+                  title="Files Map"
+                  theme={theme}
+                  actions={
+                    <button
+                      onClick={() => setShowHexNav(false)}
+                      style={{
+                        background: "transparent",
+                        border: "none",
+                        color: colors.textMuted,
+                        cursor: "pointer",
+                        fontSize: 18,
+                        padding: "0 4px",
+                        transition: "color 140ms ease-out",
+                        lineHeight: 1,
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.color = colors.textPrimary}
+                      onMouseLeave={(e) => e.currentTarget.style.color = colors.textMuted}
+                      aria-label="Close hex navigator"
+                    >
+                      ×
+                    </button>
+                  }
+                />
+                <div
                   style={{
-                    background: "transparent",
-                    border: "none",
-                    color: colors.textMuted,
-                    cursor: "pointer",
-                    fontSize: 18,
-                    padding: "0 4px",
-                    transition: "color 140ms ease-out",
-                    lineHeight: 1,
+                    height: hexNavHeight,
+                    overflow: "hidden",
+                    position: "relative",
                   }}
-                  onMouseEnter={(e) => e.currentTarget.style.color = colors.textPrimary}
-                  onMouseLeave={(e) => e.currentTarget.style.color = colors.textMuted}
-                  aria-label="Close hex navigator"
                 >
-                  ×
-                </button>
-              }
-            />
-            <div
-              style={{
-                height: hexNavHeight,
-                overflow: "hidden",
-                position: "relative",
-              }}
-            >
-              <HexFileNavigator
-                documents={documents}
-                currentDocumentId={currentDocumentId}
-                onSelect={setCurrentDocumentId}
-                onClose={handleCloseFile}
-                onRename={(id) => {
-                  const doc = documents.find(d => d.id === id);
-                  if (doc) setRenamingDoc(doc);
-                }}
-                theme={theme}
-              />
-            </div>
+                  <HexFileNavigator
+                    documents={documents}
+                    currentDocumentId={currentDocumentId}
+                    onSelect={setCurrentDocumentId}
+                    onClose={handleCloseFile}
+                    onRename={(id) => {
+                      const doc = documents.find(d => d.id === id);
+                      if (doc) setRenamingDoc(doc);
+                    }}
+                    theme={theme}
+                  />
+                </div>
+              </>
+            )}
 
             {/* Divider */}
-            {showOutput && (
+            {showOutput && showHexNav && (
               <div
                 data-divider
                 style={{
-                  height: 1,
-                  background: isResizingPanel ? colors.accentMint : colors.borderSubtle,
+                  height: 10,
+                  background: isResizingPanel ? `${colors.accentMint}30` : "transparent",
                   cursor: "ns-resize",
                   transition: isResizingPanel ? "none" : "background 140ms ease-out",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+                onMouseEnter={(e) => {
+                  if (!isResizingPanel) e.currentTarget.style.background = `${colors.borderSubtle}60`;
+                }}
+                onMouseLeave={(e) => {
+                  if (!isResizingPanel) e.currentTarget.style.background = "transparent";
                 }}
                 title="Drag to resize"
-              />
+              >
+                <div style={{ width: "50%", height: 2, background: colors.borderSubtle, borderRadius: 2 }} />
+              </div>
             )}
 
             {/* Output Panel */}

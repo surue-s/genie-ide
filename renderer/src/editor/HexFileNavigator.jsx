@@ -133,6 +133,7 @@ export default function HexFileNavigator({ documents, currentDocumentId, onSelec
           cursor: 'pointer',
           transition: 'all 0.2s ease',
           filter: isActive ? 'drop-shadow(0 0 16px #b8a4c9) drop-shadow(0 0 8px #9fa8d6)' : 'none',
+          zIndex: hoveredId === doc.id ? 30 : isActive ? 20 : 10,
         }}
         onMouseEnter={() => setHoveredId(doc.id)}
         onMouseLeave={() => setHoveredId(null)}
@@ -278,7 +279,7 @@ export default function HexFileNavigator({ documents, currentDocumentId, onSelec
               pointerEvents: 'none',
               opacity: hoveredId === doc.id ? 1 : 0,
               transition: 'opacity 140ms ease-out',
-              zIndex: 100,
+                zIndex: hoveredId === doc.id ? 200 : 50,
               boxShadow: `0 2px 8px ${colors.shadow}`,
             }}
           >
