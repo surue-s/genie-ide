@@ -224,13 +224,15 @@ export default function App() {
       {/* Header with controls */}
       <div
         style={{
-          padding: "14px 20px",
+          padding: "10px 16px",
           borderBottom: `1px solid ${colors.borderSubtle}`,
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
           gap: 12,
           background: colors.bgPanel,
+          flexShrink: 0,
+          minHeight: 50,
         }}
       >
         <div style={{ display: "flex", gap: 10 }}>
@@ -435,7 +437,7 @@ export default function App() {
           </button>
         </div>
       </div>
-      <div style={{ display: "flex", flex: 1, overflow: "hidden", position: "relative" }}>
+      <div style={{ display: "flex", flex: 1, overflow: "hidden", position: "relative", minHeight: 0 }}>
         
         {/* Left Panel - Folder Manager */}
         <div
@@ -445,6 +447,7 @@ export default function App() {
             borderRight: `1px solid ${colors.borderSubtle}`,
             display: "flex",
             flexDirection: "column",
+            minHeight: 0,
           }}
         >
           <PanelHeader
@@ -476,6 +479,7 @@ export default function App() {
             display: "flex",
             flexDirection: "column",
             minWidth: 0,
+            minHeight: 0,
             background: colors.bgApp,
           }}
         >
@@ -507,6 +511,7 @@ export default function App() {
               display: "flex",
               flexDirection: "column",
               position: "relative",
+              minHeight: 0,
             }}
             onMouseDown={handlePanelMouseDown}
           >
