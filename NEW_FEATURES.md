@@ -92,7 +92,7 @@ renderer/src/
 │   ├── fileExtensions.js      # Extension mappings
 │   └── shortcuts.js           # Keyboard shortcuts
 ├── editor/
-│   ├── CodeEditor.jsx         # Monaco editor wrapper
+│   ├── CodeEditor.jsx         # CodeMirror 6 editor wrapper
 │   ├── FileRenameModal.jsx    # Rename dialog
 │   ├── HexFileNavigator.jsx   # Hexagonal file view
 │   ├── Output.jsx             # Code execution output

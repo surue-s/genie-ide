@@ -74,8 +74,32 @@ body {
 /* Monospace for code */
 code,
 pre,
-.editor {
-  font-family: 'JetBrains Mono', 'Fira Code', 'IBM Plex Mono', 'Consolas', 'Monaco', monospace;
+.editor,
+.cm-editor {
+  font-family: 'JetBrains Mono', 'Fira Code', 'IBM Plex Mono', 'Consolas', monospace;
+}
+
+/* CodeMirror editor styling */
+.cm-editor {
+  height: 100%;
+  font-size: 14px;
+}
+
+.cm-editor.cm-focused {
+  outline: none;
+}
+
+.cm-scroller {
+  overflow: auto;
+  font-family: 'JetBrains Mono', 'Fira Code', 'IBM Plex Mono', 'Consolas', monospace !important;
+}
+
+.cm-content {
+  caret-color: #63D2C6;
+}
+
+.cm-gutters {
+  border-right: none !important;
 }
 
 /* Light theme adjustments via body class if needed */

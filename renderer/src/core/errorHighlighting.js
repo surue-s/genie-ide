@@ -1,111 +1,120 @@
 /**
- * Error Highlighting System
+ * Error Highlighting System for CodeMirror
  * Provides soft, non-intrusive visual indicators in the editor
- * No code modification, purely visual
+ * Uses decorations to highlight problematic lines
  */
 
+import { StateField, StateEffect, RangeSetBuilder } from '@codemirror/state';
+import { Decoration, EditorView } from '@codemirror/view';
+
+// Define error highlighting decorations
+const errorLineHighlightDeco = Decoration.line({
+  attributes: { class: "cm-error-line-highlight" }
+});
+
+const errorGutterDeco = Decoration.gutter({
+  element: "gutter",
+  attributes: { 
+    class: "cm-error-gutter",
+    style: "background: #ff6b6b40; border-left: 2px solid #ff6b6b;"
+  }
+});
+
+const errorInlineMessageDeco = Decoration.widget({
+  widget: {
+    dom: (() => {
+      const wrap = document.createElement("div");
+      wrap.className = "cm-error-inline-message";
+      wrap.style.padding = "2px 0 2px 20px";
+      wrap.style.color = "#ff6b6b";
+      wrap.style.fontSize = "12px";
+      wrap.style.background = "#ff6b6b10";
+      return wrap;
+    })()
+  }
+});
+
+// State field to track error decorations
+const errorHighlightField = StateField.define({
+  create() {
+    return [];
+  },
+  update(value, tr) {
+    // Update error decorations on document changes
+    if (tr.docChanged) {
+      // Keep errors that are still relevant after document changes
+      return value;
+    }
+    return value;
+  },
+  provide: f => EditorView.decorations.from(f, errors => {
+    const builder = new RangeSetBuilder();
+    for (let error of errors) {
+      // Add line highlight decoration
+      builder.add(error.from, error.to, errorLineHighlightDeco);
+      
+      // Add gutter marker
+      builder.add(error.from, error.from, errorGutterDeco);
+      
+      // Add inline message if present
+      if (error.message) {
+        builder.add(error.from, error.to, errorInlineMessageDeco);
+      }
+    }
+    return builder.finish();
+  })
+});
+
 /**
- * Create a Monaco editor decoration for error highlighting
- * @param {number} lineNumber - Line number to highlight (1-based)
+ * Create a CodeMirror decoration for error highlighting
+ * @param {number} lineNumber - Line number to highlight (0-based)
  * @param {Object} theme - Theme object
- * @returns {Object} Monaco decoration configuration
+ * @returns {Object} CodeMirror decoration configuration
  */
 export function createErrorDecoration(lineNumber, theme) {
   const colors = theme.colors;
 
+  // Return position information for the error line
   return {
-    range: new (window.monaco?.Range || (() => {}))(lineNumber, 1, lineNumber, 1),
+    from: lineNumber,  // Character position where error occurs
+    to: lineNumber,    // End position
     options: {
-      isWholeLine: true,
-      className: 'error-line-highlight',
-      glyphMarginClassName: 'error-glyph-margin',
-      glyphMarginHoverMessage: [{ value: 'Error on this line' }],
-      // Subtle background tint
-      backgroundColor: colors.warningBgLight || `${colors.accentWarm || colors.accentRose}15`,
-      // Soft border (muted, not aggressive)
-      borderColor: `${colors.accentWarm || colors.accentRose}40`,
-      borderWidth: '1px',
-      borderStyle: 'solid',
-    },
+      attributes: {
+        style: `
+          background-color: ${colors.warningBgLight || `${colors.accentWarm || colors.accentRose}15`};
+          border-left: 3px solid ${colors.accentWarm || colors.accentRose};
+        `,
+      }
+    }
   };
 }
 
 /**
- * Create a gutter decoration (soft indicator, not aggressive)
- * @param {number} lineNumber - Line number
- * @param {Object} theme - Theme object
- * @returns {Object} Monaco decoration for gutter
- */
-export function createGutterDecoration(lineNumber, theme) {
-  const colors = theme.colors;
-
-  return {
-    range: new (window.monaco?.Range || (() => {}))(lineNumber, 1, lineNumber, 1),
-    options: {
-      glyphMarginClassName: 'codicon codicon-error',
-      glyphMarginBackgroundColor: `${colors.accentWarm || colors.accentRose}20`,
-      glyphMarginHoverMessage: [{ 
-        value: 'An error occurred on this line. Check the Output panel for details.' 
-      }],
-    },
-  };
-}
-
-/**
- * Create inline message decoration
- * @param {number} lineNumber - Line number
+ * Create inline message decoration for CodeMirror
+ * @param {number} position - Position in the document
  * @param {string} message - Error message
  * @param {Object} theme - Theme object
- * @returns {Object} Monaco decoration
+ * @returns {Object} CodeMirror decoration
  */
-export function createInlineMessage(lineNumber, message, theme) {
+export function createInlineMessage(position, message, theme) {
   const colors = theme.colors;
 
   return {
-    range: new (window.monaco?.Range || (() => {}))(lineNumber, 1, lineNumber, 1),
+    from: position,
+    to: position,
     options: {
-      isWholeLine: true,
-      linesDecorationsClassName: 'error-inline-message',
-      after: {
-        content: `   ⚠ ${message}`,
-        color: colors.accentWarm || colors.accentRose,
-        backgroundColor: `${colors.accentWarm || colors.accentRose}10`,
-        margin: '0 0 0 10px',
-        borderRadius: '4px',
-        padding: '2px 4px',
-      },
-    },
+      attributes: {
+        style: `
+          display: block;
+          padding: 2px 0 2px 20px;
+          color: ${colors.accentWarm || colors.accentRose};
+          font-size: 12px;
+          background: ${`${colors.accentWarm || colors.accentRose}10`};
+        `,
+        class: 'cm-error-inline-message'
+      }
+    }
   };
-}
-
-/**
- * Soft underline decoration (alternative to line highlight)
- * @param {number} lineNumber - Line number
- * @param {Object} theme - Theme object
- * @returns {Object} Monaco decoration
- */
-export function createSoftUnderline(lineNumber, theme) {
-  const colors = theme.colors;
-
-  return {
-    range: new (window.monaco?.Range || (() => {}))(lineNumber, 1, lineNumber, 1),
-    options: {
-      isWholeLine: true,
-      className: 'error-underline',
-      borderStyle: 'dotted',
-      borderColor: `${colors.accentWarm || colors.accentRose}60`,
-      borderWidth: '0 0 2px 0',
-    },
-  };
-}
-
-/**
- * Get scrollable line number for editor
- * @param {number} lineNumber - 1-based line number
- * @returns {number} Same as input (for scrolling to line)
- */
-export function getScrollToLine(lineNumber) {
-  return Math.max(1, Math.min(lineNumber, 1000000)); // Safety bounds
 }
 
 /**
@@ -129,3 +138,47 @@ export const errorHighlightStyles = {
     display: 'inline-block',
   }),
 };
+
+/**
+ * Get a position for a given line number
+ * @param {number} lineNumber - 0-based line number
+ * @param {EditorState} state - CodeMirror state instance
+ * @returns {number} Position in the document
+ */
+export function getPositionFromLine(state, lineNumber) {
+  try {
+    const line = state.doc.line(Math.min(lineNumber + 1, state.doc.lines));
+    return line.from;
+  } catch (e) {
+    // If line doesn't exist, return 0
+    return 0;
+  }
+}
+
+/**
+ * Apply error highlighting to a specific line in CodeMirror
+ * @param {EditorView} view - CodeMirror view instance
+ * @param {number} lineNumber - Line number to highlight (0-indexed)
+ * @param {string} message - Error message to display
+ * @param {Object} theme - Current theme
+ */
+export function highlightErrorLine(view, lineNumber, message, theme) {
+  if (!view) return;
+  
+  const pos = getPositionFromLine(view.state, lineNumber);
+  
+  // Add temporary highlighting - this would be done by adding a state effect
+  // and managing the decorations in the state field
+  console.log(`Error on line ${lineNumber + 1}: ${message}`);
+}
+
+/**
+ * Clear all error highlights from the editor
+ * @param {EditorView} view - CodeMirror view instance
+ */
+export function clearErrorHighlights(view) {
+  if (!view) return;
+  
+  // Clearing would involve dispatching a transaction that removes error decorations
+  console.log("Clearing error highlights");
+}

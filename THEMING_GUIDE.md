@@ -73,13 +73,13 @@ Users can switch themes via the Theme dropdown in the header:
 - Keyboard accessible (Tab, Enter, Esc, Arrow keys)
 - Persists selection to localStorage
 
-### 4. Monaco Editor Themes
+### 4. CodeMirror Editor Themes
 
-Custom themes defined for code editor:
+Custom themes defined for code editor using CodeMirror 6:
 
-- **genie-dark**: Matches Calm Retro Mauve palette
-- **genie-light**: Matches Soft Light palette
-- Syntax token colors aligned with UI theme
+- **oneDark**: Dark theme from `@codemirror/theme-one-dark`
+- **lightTheme**: Custom light theme matching Soft Light palette
+- Syntax token colors aligned with UI theme via `syntaxHighlighting`
 
 ## Adding a New Theme
 
@@ -104,25 +104,31 @@ export const themes = {
 };
 ```
 
-2. **Add Monaco theme in `CodeEditor.jsx`**:
+2. **Add CodeMirror theme in `CodeEditor.jsx`** (if needed):
 
 ```javascript
-monaco.editor.defineTheme("my-theme-monaco", {
-  base: "vs-dark", // or 'vs'
-  inherit: false,
-  rules: [
-    { token: "keyword", foreground: "..." },
-    // ... token rules
-  ],
-  colors: {
-    "editor.background": "#...",
-    // ... editor UI colors
+import { EditorView } from "@codemirror/view";
+
+const myCustomTheme = EditorView.theme(
+  {
+    "&": {
+      backgroundColor: "#...",
+      color: "#...",
+    },
+    ".cm-content": {
+      caretColor: "#...",
+    },
+    ".cm-gutters": {
+      backgroundColor: "#...",
+      color: "#...",
+    },
   },
-});
+  { dark: true },
+); // or { dark: false } for light themes
 ```
 
 3. **Update theme mapping**:
-   Update the `beforeMount` and theme change logic in CodeEditor to handle the new theme.
+   Update the theme compartment reconfiguration logic in CodeEditor to handle the new theme.
 
 ## Design Principles
 

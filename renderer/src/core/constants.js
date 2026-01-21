@@ -10,27 +10,27 @@ export const LANGUAGE_VERSIONS = {
   php: "8.2.3",
 };
 
-// Map Monaco language IDs to Piston API language names
-export const MONACO_TO_PISTON = {
-  javascript: "javascript",
-  typescript: "typescript",
-  python: "python",
-  java: "java",
-  c: "c",
-  cpp: "c++",
-  go: "go",
-  rust: "rust",
-  php: "php",
-};
-
-// Map internal language names to Monaco language IDs
-export const LANGUAGE_TO_MONACO = {
+// Map internal language names (these can be used by any editor implementation)
+export const LANGUAGE_NAMES = {
   javascript: "javascript",
   typescript: "typescript",
   python: "python",
   java: "java",
   c: "c",
   "c++": "cpp",
+  go: "go",
+  rust: "rust",
+  php: "php",
+};
+
+// For API calls to external services like Piston
+export const LANGUAGE_TO_PISTON = {
+  javascript: "javascript",
+  typescript: "typescript",
+  python: "python",
+  java: "java",
+  c: "c",
+  "c++": "c++",
   go: "go",
   rust: "rust",
   php: "php",

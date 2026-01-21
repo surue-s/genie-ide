@@ -14,8 +14,11 @@ FRAMEWORK: React 19.2.3 + Electron 39.2.7
 PRIMARY DEPENDENCIES:
 - react@19.2.3                    - UI Framework & component library
 - react-dom@19.2.3                - React DOM rendering
-- @monaco-editor/react@4.7.0      - Advanced code editor (Microsoft Monaco)
-- monaco-editor@0.55.1            - Monaco editor core library
+- @codemirror/view@6.39.11        - CodeMirror 6 view layer
+- @codemirror/state@6.5.4         - CodeMirror 6 state management
+- @codemirror/language@6.12.1     - CodeMirror 6 language support
+- @codemirror/theme-one-dark@6.1.0 - CodeMirror dark theme
+- @codemirror/lang-*              - Language support packages
 - axios@1.13.2                    - HTTP client for API requests
 - electron@39.2.7                 - Desktop application framework
 
@@ -111,18 +114,18 @@ renderer/src/
     ├── App.jsx (See App.jsx above)
     │
     ├── CodeEditor.jsx
-    │   ├─ Component: Wraps Monaco Editor
-    │   ├─ Props: document, onChange, editorRef
-    │   ├─ Monaco Options:
-    │   │  ├─ automaticLayout: true
-    │   │  ├─ fontSize: 14
-    │   │  ├─ wordWrap: 'on'
-    │   │  ├─ smoothScrolling: true
-    │   │  └─ formatOnPaste: true
-    │   └─ Keyboard Shortcuts Mapped:
-    │      ├─ End key: cursorEnd
-    │      ├─ Home key: cursorHome
-    │      └─ Ctrl+S: Save (placeholder)
+    │   ├─ Component: Wraps CodeMirror 6 Editor
+    │   ├─ Props: document, onChange, editorRef, theme
+    │   ├─ CodeMirror Extensions:
+    │   │  ├─ basicSetup (line numbers, folding, etc.)
+    │   │  ├─ Language compartment (dynamic switching)
+    │   │  ├─ Theme compartment (oneDark/light)
+    │   │  ├─ Auto-completion
+    │   │  └─ Bracket matching
+    │   └─ Features:
+    │      ├─ Dynamic language switching
+    │      ├─ Theme synchronization
+    │      └─ Document state management
     │
     ├── Output.jsx
     │   ├─ Component: Renders code execution output
@@ -353,7 +356,7 @@ Example: File Switch Flow
 3. setCurrentDocumentId(fileId) called
 4. currentDocument changes via useMemo
 5. CodeEditor re-renders with new document.text
-6. Monaco editor displays new code
+6. CodeMirror editor displays new code
 
 Example: Dependency Visualization
 1. HexFileNavigator mounts
@@ -479,13 +482,15 @@ FILE OPERATIONS:
 CODE EXECUTION:
 └─ Ctrl+Enter   → Run code
 
-MONACO EDITOR (Built-in):
+CODEMIRROR EDITOR (Built-in):
 ├─ Home          → Start of line
 ├─ End           → End of line
-├─ Ctrl+/        → Toggle comment
-├─ Alt+Up/Down   → Move line
-├─ Shift+Alt+Up/Down → Duplicate line
-└─ Ctrl+F        → Find
+├─ Ctrl+/        → Toggle line comment
+├─ Tab           → Indent with tab
+├─ Ctrl+Z        → Undo
+├─ Ctrl+Y        → Redo
+├─ Ctrl+F        → Find
+└─ Ctrl+D        → Select next occurrence
 
 ================================================================================
 11. PERFORMANCE CONSIDERATIONS
@@ -503,7 +508,7 @@ POTENTIAL BOTTLENECKS:
 ├─ Large file count → Dependency analysis O(n²)
 ├─ Complex regex parsing → Use memoization
 ├─ Many hexagons → Virtualize if >100 files
-├─ Large code files → Monaco handles well up to ~1MB
+├─ Large code files → CodeMirror handles well up to ~1MB
 └─ API latency → Network dependent (Piston)
 
 MEMORY MANAGEMENT:
@@ -550,7 +555,7 @@ npm run dev:electron          # Full Electron app
 PRODUCTION CONSIDERATIONS:
 ├─ Electron packaging for distribution
 ├─ Code minification enabled
-├─ Monaco editor bundled
+├─ CodeMirror editor bundled
 ├─ API calls to public Piston endpoint
 └─ No backend required (fully client-side)
 
@@ -605,7 +610,7 @@ HEX VIEW NOT SHOWING CONNECTIONS:
 KEYBOARD SHORTCUTS NOT WORKING:
 1. Check focus is on window, not input
 2. Some shortcuts may be OS-reserved
-3. Monaco editor may override shortcuts
+3. CodeMirror editor may override shortcuts
 4. Check for modifier key conflicts
 
 PERFORMANCE ISSUES:
