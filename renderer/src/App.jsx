@@ -216,9 +216,13 @@ export default function App() {
         display: "flex",
         flexDirection: "column",
         height: "100vh",
+        width: "100vw",
+        margin: 0,
+        padding: 0,
         background: colors.bgApp,
         color: colors.textPrimary,
         fontFamily: "'Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', sans-serif",
+        overflow: "hidden",
       }}
     >
       {/* Header with controls */}
