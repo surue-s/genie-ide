@@ -1,13 +1,29 @@
-/* Global Styles - Calm Retro Mauve Design System */
-
-* {
-  box-sizing: border-box;
+:root {
+  --base-font-size: 14px; /* Default, overridden by React state */
 }
 
-/* Scrollbar Styling - Adapts to theme */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden; /* Prevent default body scroll */
+  height: 100vh; /* Ensure body takes full viewport height */
+}
+
+/* Hide scrollbars for the main app container */
+#root {
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Custom scrollbar styling */
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -15,119 +31,21 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #9C8FB4;
-  border-radius: 6px;
-  transition: background 140ms ease-out;
+  background: #555;
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #C9BEDA;
+  background: #777;
 }
 
-/* Selection styling */
+/* Focus ring styles for better accessibility */
+:focus-visible {
+  outline: 2px solid #4FBFB3;
+  outline-offset: 2px;
+}
+
+/* Selection color styling */
 ::selection {
-  background: rgba(99, 210, 198, 0.3);
-  color: inherit;
+  background-color: rgba(79, 191, 179, 0.2);
 }
-
-/* Focus ring for inputs */
-input:focus,
-select:focus,
-textarea:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(99, 210, 198, 0.35);
-}
-
-/* Button base styles */
-button {
-  font-family: inherit;
-  transition: all 140ms ease-out;
-}
-
-button:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(99, 210, 198, 0.35);
-}
-
-/* Smooth animations */
-@media (prefers-reduced-motion: no-preference) {
-  * {
-    scroll-behavior: smooth;
-  }
-}
-
-/* Typography defaults */
-html, body, #root {
-  height: 100%;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  border: none;
-}
-
-html {
-  overflow: hidden;
-}
-
-body {
-  overflow: hidden;
-  background: #171322;
-  color: #F1EAF7;
-  font-family: 'Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* Monospace for code */
-code,
-pre,
-.editor,
-.cm-editor {
-  font-family: 'JetBrains Mono', 'Fira Code', 'IBM Plex Mono', 'Consolas', monospace;
-}
-
-/* CodeMirror editor styling */
-.cm-editor {
-  height: 100% !important;
-  font-size: 14px;
-  display: flex;
-  flex-direction: column;
-}
-
-.cm-editor.cm-focused {
-  outline: none;
-}
-
-.cm-scroller {
-  overflow: auto;
-  font-family: 'JetBrains Mono', 'Fira Code', 'IBM Plex Mono', 'Consolas', monospace !important;
-  flex: 1;
-}
-
-.cm-content {
-  caret-color: #63D2C6;
-}
-
-.cm-gutters {
-  border-right: none !important;
-  background: transparent !important;
-}
-
-/* Light theme adjustments via body class if needed */
-body.theme-light {
-  background: #FAF8FB;
-  color: #2B1F3A;
-}
-
-body.theme-light ::-webkit-scrollbar-thumb {
-  background: #8C7FA3;
-}
-
-body.theme-light ::-webkit-scrollbar-thumb:hover {
-  background: #5A4F6B;
-}
-
-body.theme-light ::selection {
-  background: rgba(79, 191, 179, 0.25);
-}
-

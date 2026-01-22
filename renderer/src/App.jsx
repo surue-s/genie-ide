@@ -7,6 +7,7 @@ import ShortcutsHelp from "./editor/ShortcutsHelp";
 import ThemeControl from "./editor/ThemeControl";
 import PanelHeader from "./editor/PanelHeader";
 import MusicPlayerPanel from "./editor/MusicPlayerPanel";
+import Settings from "./editor/Settings";
 import { createDocument, changeLanguage } from "./core/document";
 import { LANGUAGE_VERSIONS } from "./core/constants";
 import { getExtensionForLanguage } from "./core/fileExtensions";
@@ -28,6 +29,14 @@ export default function App() {
   const [outputHeight, setOutputHeight] = useState(250); // pixels
   const [isResizingPanel, setIsResizingPanel] = useState(false);
   const [isResizingRightPanel, setIsResizingRightPanel] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [uiScale, setUiScale] = useState(1.0);
+  const [fontSize, setFontSize] = useState(() => {
+    const saved = localStorage.getItem('fontSize');
+    return saved ? parseInt(saved) : 14;
+  });
+  const [brightness, setBrightness] = useState(1.0);
+  const [contrast, setContrast] = useState(1.0);
   const editorRef = useRef(null);
   const outputRef = useRef(null);
   const [rightPanelWidth, setRightPanelWidth] = useState(300);
@@ -45,6 +54,11 @@ export default function App() {
     setCurrentThemeKey(themeKey);
     localStorage.setItem('themeKey', themeKey);
   };
+
+  // Persist font size changes
+  useEffect(() => {
+    localStorage.setItem('fontSize', fontSize.toString());
+  }, [fontSize]);
 
   /* Handlers */
 
@@ -223,8 +237,22 @@ export default function App() {
         color: colors.textPrimary,
         fontFamily: "'Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', sans-serif",
         overflow: "hidden",
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        filter: `brightness(${brightness}) contrast(${contrast})`,
+        fontSize: `${fontSize}px`,
       }}
     >
+      {/* Main layout wrapper with scale applied */}
+      <div style={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+        width: "100%",
+        transform: `scale(${uiScale})`,
+        transformOrigin: 'top left',
+      }}>
       {/* Header with controls */}
       <div
         style={{
@@ -438,6 +466,36 @@ export default function App() {
               <circle cx="18" cy="16" r="3"/>
             </svg>
             Music
+          </button>
+          
+          <button
+            onClick={() => setShowSettings(true)}
+            style={{
+              background: colors.buttonBg,
+              border: `1px solid ${colors.borderSubtle}`,
+              color: colors.buttonText,
+              padding: "8px 14px",
+              cursor: "pointer",
+              borderRadius: "10px",
+              fontSize: 13,
+              fontWeight: 500,
+              transition: "all 140ms ease-out",
+              height: 36,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.background = colors.buttonBgHover}
+            onMouseLeave={(e) => e.currentTarget.style.background = colors.buttonBg}
+            onFocus={(e) => e.currentTarget.style.boxShadow = colors.focusRing}
+            onBlur={(e) => e.currentTarget.style.boxShadow = 'none'}
+            title="Open settings panel"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"/>
+            </svg>
+            Settings
           </button>
         </div>
       </div>
@@ -669,6 +727,7 @@ export default function App() {
           </div>
         )}
       </div>
+      </div> {/* End scale wrapper */}
 
       {/* Rename Modal */}
       {renamingDoc && (
@@ -690,6 +749,23 @@ export default function App() {
         isOpen={showMusicPlayer}
         onClose={() => setShowMusicPlayer(false)}
         theme={theme}
+      />
+      
+      {/* Settings Panel */}
+      <Settings
+        isOpen={showSettings}
+        onClose={() => setShowSettings(false)}
+        uiScale={uiScale}
+        setUiScale={setUiScale}
+        fontSize={fontSize}
+        setFontSize={setFontSize}
+        brightness={brightness}
+        setBrightness={setBrightness}
+        contrast={contrast}
+        setContrast={setContrast}
+        theme={theme}
+        onThemeChange={handleThemeChange}
+        currentTheme={currentThemeKey}
       />
     </div>
   );
