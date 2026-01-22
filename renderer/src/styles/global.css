@@ -1,18 +1,5 @@
 :root {
-  --base-font-size: 14px; /* Default, overridden by React state */
-}
-
-body {
-  margin: 0;
-  padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  overflow: hidden; /* Prevent default body scroll */
-  height: 100vh; /* Ensure body takes full viewport height */
-}
+  --base-font-size: 14px; /* Defa, 
 
 /* Hide scrollbars for the main app container */
 #root {

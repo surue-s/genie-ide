@@ -8,6 +8,7 @@ import ThemeControl from "./editor/ThemeControl";
 import PanelHeader from "./editor/PanelHeader";
 import MusicPlayerPanel from "./editor/MusicPlayerPanel";
 import Settings from "./editor/Settings";
+import CoursePanel from "./course/ui/CoursePanel";
 import { createDocument, changeLanguage } from "./core/document";
 import { LANGUAGE_VERSIONS } from "./core/constants";
 import { getExtensionForLanguage } from "./core/fileExtensions";
@@ -30,6 +31,7 @@ export default function App() {
   const [isResizingPanel, setIsResizingPanel] = useState(false);
   const [isResizingRightPanel, setIsResizingRightPanel] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showCoursePanel, setShowCoursePanel] = useState(false);
   const [uiScale, setUiScale] = useState(1.0);
   const [fontSize, setFontSize] = useState(() => {
     const saved = localStorage.getItem('fontSize');
@@ -382,6 +384,33 @@ export default function App() {
           </button>
 
           <button
+            onClick={() => setShowCoursePanel(!showCoursePanel)}
+            style={{
+              background: showCoursePanel ? colors.chipSelectedBg : colors.buttonBg,
+              border: `1px solid ${showCoursePanel ? colors.chipSelectedBorder : colors.borderSubtle}`,
+              color: showCoursePanel ? colors.accentRose : colors.buttonText,
+              padding: "8px 14px",
+              cursor: "pointer",
+              borderRadius: "10px",
+              fontWeight: showCoursePanel ? 600 : 500,
+              fontSize: 13,
+              transition: "all 140ms ease-out",
+              height: 36,
+            }}
+            onMouseEnter={(e) => {
+              if (!showCoursePanel) e.currentTarget.style.background = colors.buttonBgHover;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = showCoursePanel ? colors.chipSelectedBg : colors.buttonBg;
+            }}
+            onFocus={(e) => e.currentTarget.style.boxShadow = colors.focusRing}
+            onBlur={(e) => e.currentTarget.style.boxShadow = 'none'}
+            title="Open the guided JS course"
+          >
+            Course
+          </button>
+
+          <button
             onClick={() => setShowOutput(!showOutput)}
             style={{
               background: showOutput ? colors.chipSelectedBg : colors.buttonBg,
@@ -533,6 +562,15 @@ export default function App() {
             theme={theme}
           />
         </div>
+
+        {/* Course Panel - docked beside editor */}
+        {showCoursePanel && (
+          <CoursePanel
+            isOpen={showCoursePanel}
+            onClose={() => setShowCoursePanel(false)}
+            theme={theme}
+          />
+        )}
 
         {/* Center Panel - Code Editor (full height) */}
         <div
