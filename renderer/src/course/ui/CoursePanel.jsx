@@ -7,7 +7,7 @@ import ProgressBar from "./ProgressBar";
 import Controls from "./Controls";
 import LessonViewport from "./LessonViewport";
 
-export default function CoursePanel({ isOpen, onClose, theme }) {
+export default function CoursePanel({ isOpen, onClose, theme, width = 340, isResizing = false }) {
   const [progress, setProgress] = useState(() => loadProgress());
   const [activeLessonId, setActiveLessonId] = useState(() => lessons[0]?.id);
   const [runnerState, setRunnerState] = useState(() => createRunnerState(lessons[0]?.id, getLessonProgress(progress, lessons[0]?.id)));
@@ -39,14 +39,37 @@ export default function CoursePanel({ isOpen, onClose, theme }) {
   return (
     <div
       style={{
-        width: 340,
+        width: width,
         background: theme.colors.bgPanel,
         borderLeft: `1px solid ${theme.colors.borderSubtle}`,
         display: "flex",
         flexDirection: "column",
         minHeight: 0,
+        position: "relative",
       }}
     >
+      {/* Right resize handle */}
+      <div
+        data-course-resize
+        style={{
+          position: "absolute",
+          right: -4,
+          top: 0,
+          bottom: 0,
+          width: 12,
+          cursor: "ew-resize",
+          background: isResizing ? `${theme.colors.accentMint}40` : "transparent",
+          transition: isResizing ? "none" : "background 140ms ease-out",
+          zIndex: 12,
+        }}
+        onMouseEnter={(e) => {
+          if (!isResizing) e.currentTarget.style.background = `${theme.colors.borderSubtle}60`;
+        }}
+        onMouseLeave={(e) => {
+          if (!isResizing) e.currentTarget.style.background = "transparent";
+        }}
+        title="Drag to resize panel"
+      />
       <div style={{
         display: "flex",
         justifyContent: "space-between",

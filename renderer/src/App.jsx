@@ -30,8 +30,10 @@ export default function App() {
   const [outputHeight, setOutputHeight] = useState(250); // pixels
   const [isResizingPanel, setIsResizingPanel] = useState(false);
   const [isResizingRightPanel, setIsResizingRightPanel] = useState(false);
+  const [isResizingCoursePanel, setIsResizingCoursePanel] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showCoursePanel, setShowCoursePanel] = useState(false);
+  const [coursePanelWidth, setCoursePanelWidth] = useState(340);
   const [uiScale, setUiScale] = useState(1.0);
   const [fontSize, setFontSize] = useState(() => {
     const saved = localStorage.getItem('fontSize');
@@ -170,6 +172,8 @@ export default function App() {
       setIsResizingPanel(true);
     } else if (e.target.closest('[data-right-resize]')) {
       setIsResizingRightPanel(true);
+    } else if (e.target.closest('[data-course-resize]')) {
+      setIsResizingCoursePanel(true);
     }
   };
 
@@ -223,6 +227,29 @@ export default function App() {
       };
     }
   }, [isResizingRightPanel]);
+
+  useEffect(() => {
+    if (isResizingCoursePanel) {
+      const handleMouseMove = (e) => {
+        const minWidth = 280;
+        const maxWidth = 600;
+        const newWidth = Math.max(minWidth, Math.min(maxWidth, e.clientX));
+        setCoursePanelWidth(newWidth);
+      };
+
+      const handleMouseUp = () => {
+        setIsResizingCoursePanel(false);
+      };
+
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [isResizingCoursePanel]);
 
   /* UI */
 
@@ -565,11 +592,15 @@ export default function App() {
 
         {/* Course Panel - docked beside editor */}
         {showCoursePanel && (
-          <CoursePanel
-            isOpen={showCoursePanel}
-            onClose={() => setShowCoursePanel(false)}
-            theme={theme}
-          />
+          <div onMouseDown={handlePanelMouseDown}>
+            <CoursePanel
+              isOpen={showCoursePanel}
+              onClose={() => setShowCoursePanel(false)}
+              theme={theme}
+              width={coursePanelWidth}
+              isResizing={isResizingCoursePanel}
+            />
+          </div>
         )}
 
         {/* Center Panel - Code Editor (full height) */}
